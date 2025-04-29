@@ -22,8 +22,8 @@ applications_collection = db["Applications"]  # New collection for applications
 def encode_password(password):
     # Convert password to base64
     base64_bytes = base64.b64encode(password.encode('utf-8'))
-    # Return as binary
-    return base64_bytes
+    # Return as string
+    return base64_bytes.decode('utf-8')
 
 @app.route('/')
 def index():
@@ -59,7 +59,7 @@ def register():
     result = users_collection.insert_one(user)
     
     return jsonify({"message": "User registered successfully", "id": str(result.inserted_id)}), 201
-
+ 
 # Login route
 @app.route('/api/login', methods=['POST'])
 def login():
