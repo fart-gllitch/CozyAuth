@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy - Pricing Plans</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8A2BE2;
+            --secondary: #4B0082;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --text: #f0f0f0;
+            --text-muted: #a0a0a0;
+            --accent: #32CD32;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: var(--darker);
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .logo span {
+            color: var(--primary);
+            margin-right: 8px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 32px;
+        }
+        
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(75, 0, 130, 0.3);
+        }
+
+        /* Pricing Hero Section */
+        .pricing-hero {
+            padding-top: 120px;
+            padding-bottom: 60px;
+            background: radial-gradient(circle at 50% 50%, var(--darker), var(--dark));
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .pricing-hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 80% 60%, rgba(50, 205, 50, 0.05) 0%, transparent 20%);
+            z-index: 1;
+        }
+        
+        .pricing-hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .pricing-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .pricing-hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Pricing Toggle */
+        .pricing-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+
+        .toggle-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin: 0 15px;
+        }
+
+        .toggle-label.active {
+            color: var(--text);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--primary);
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+            background-color: var(--accent);
+        }
+
+        /* Price Tables */
+        .price-tables {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+
+        .price-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 40px 30px;
+            width: 320px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .price-card.popular {
+            border: 2px solid var(--primary);
+            position: relative;
+            transform: scale(1.05);
+        }
+
+        .price-card.popular::after {
+            content: "Most Popular";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .price-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .price-card.popular:hover {
+            transform: translateY(-10px) scale(1.05);
+        }
+
+        .price-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .price-badge {
+            display: inline-block;
+            background-color: rgba(50, 205, 50, 0.1);
+            color: var(--accent);
+            font-size: 0.8rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .price-amount {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .price-period {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .price-features {
+            list-style: none;
+            margin-bottom: 30px;
+            flex-grow: 1;
+        }
+
+        .price-features li {
+            padding: 10px 0;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+        }
+
+        .price-features li::before {
+            content: "✓";
+            color: var(--accent);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .price-card .cta-button {
+            width: 100%;
+            text-align: center;
+        }
+
+        .price-card.enterprise .cta-button {
+            background: linear-gradient(135deg, var(--primary), #6a0dad);
+        }
+
+        /* Compare Plans Section */
+        .compare-plans {
+            padding: 80px 0;
+            background-color: var(--darker);
+        }
+
+        .compare-plans-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .compare-plans-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .compare-plans-header p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 40px;
+            overflow-x: auto;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .comparison-table th:first-child, .comparison-table td:first-child {
+            text-align: left;
+            padding-left: 0;
+        }
+
+        .comparison-table th {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 1.1rem;
+        }
+
+        .comparison-table thead th {
+            padding-top: 0;
+        }
+
+        .comparison-table .feature-name {
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .comparison-table .check {
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .comparison-table .limit {
+            color: var(--text-muted);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 80px 0;
+            background-color: var(--dark);
+        }
+
+        .faq-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .faq-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .faq-header p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+        }
+
+        .faq-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .faq-question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .faq-answer {
+            color: var(--text-muted);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .cta-section .cta-button {
+            background-color: white;
+            color: var(--secondary);
+            font-size: 1.1rem;
+            padding: 15px 40px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--darker);
+            padding: 80px 0 40px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+        
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: block;
+        }
+        
+        .footer-info p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .social-links a {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: var(--primary);
+        }
+        
+        .footer-links h4 {
+            font-size: 1.2rem;
+            margin-bottom: 24px;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--text);
+        }
+        
+        .bottom-bar {
+            padding-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Customer Reviews */
+        .reviews-section {
+            padding: 80px 0;
+            background-color: var(--darker);
+        }
+
+        .reviews-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .reviews-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .reviews-header p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .reviews-grid {
+            display: flex;
+            overflow-x: auto;
+            padding: 20px 0;
+            scroll-snap-type: x mandatory;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .review-card {
+            scroll-snap-align: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 30px;
+            min-width: 320px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .review-stars {
+            color: #FFD700;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .review-text {
+            color: var(--text);
+            font-style: italic;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .reviewer {
+            display: flex;
+            align-items: center;
+        }
+
+        .reviewer-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .reviewer-info h4 {
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+
+        .reviewer-company {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .reviews-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .dot.active {
+            background-color: var(--primary);
+        }
+
+        /* Custom Badge */
+        .custom-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--accent), #228B22);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .pricing-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .price-tables {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .price-card {
+                width: 100%;
+                max-width: 350px;
+            }
+
+            .price-card.popular {
+                transform: scale(1);
+            }
+
+            .price-card.popular:hover {
+                transform: translateY(-10px);
+            }
+
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-table {
+                display: block;
+                overflow-x: scroll;
+            }
+
+            .review-card {
+                min-width: 280px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pricing-toggle {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .toggle-label {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-inner">
+            <a href="/index.html" class="logo"><span>Cozy</span> Auth</a>
+            <nav class="nav-links">
+                <a href="/features.html">Features</a>
+                <a href="/how-it-works">How It Works</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="#docs">Documentation</a>
+            </nav>
+            <button class="cta-button">Get Started</button>
+        </div>
+    </header>
+
+    <section class="pricing-hero">
+        <div class="container pricing-hero-content">
+            <h1>Simple, Transparent <span style="color: var(--primary);">Pricing</span></h1>
+            <p>Choose the plan that's right for your business. No hidden fees, no long-term contracts, and no surprises.</p>
+            <div class="pricing-toggle">
+                <span class="toggle-label active">Monthly</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="billing-toggle">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label">Annual <span style="color: var(--accent);">(-20%)</span></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="price-tables">
+            <div class="price-card">
+                <div class="price-name">Starter</div>
+                <span class="price-badge">For Small Teams</span>
+                <div class="price-amount">$29</div>
+                <div class="price-period">per month</div>
+                <ul class="price-features">
+                    <li>Up to 1,000 monthly authentications</li>
+                    <li>Basic analytics dashboard</li>
+                    <li>Email support (24h response)</li>
+                    <li>Standard encryption</li>
+                    <li>1 application</li>
+                    <li>7-day log retention</li>
+                </ul>
+                <button class="cta-button">Get Started</button>
+            </div>
+
+            <div class="price-card popular">
+                <div class="price-name">Professional</div>
+                <span class="price-badge">Most Popular</span>
+                <div class="price-amount">$99</div>
+                <div class="price-period">per month</div>
+                <ul class="price-features">
+                    <li>Up to 10,000 monthly authentications</li>
+                    <li>Advanced analytics & reporting</li>
+                    <li>Priority support (8h response)</li>
+                    <li>Military-grade encryption</li>
+                    <li>5 applications</li>
+                    <li>30-day log retention</li>
+                    <li>Custom user roles</li>
+                    <li>Single sign-on</li>
+                </ul>
+                <button class="cta-button">Get Started</button>
+            </div>
+
+            <div class="price-card enterprise">
+                <div class="price-name">Enterprise</div>
+                <span class="price-badge">For Large Organizations</span>
+                <div class="price-amount">Custom</div>
+                <div class="price-period">tailored to your needs</div>
+                <ul class="price-features">
+                    <li>Unlimited authentications</li>
+                    <li>Enterprise-grade analytics</li>
+                    <li>24/7 dedicated support</li>
+                    <li>Custom encryption options</li>
+                    <li>Unlimited applications</li>
+                    <li>1-year log retention</li>
+                    <li>On-premise deployment available</li>
+                    <li>SLA guarantees</li>
+                    <li>Dedicated account manager</li>
+                </ul>
+                <button class="cta-button">Contact Sales</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="compare-plans">
+        <div class="container">
+            <div class="compare-plans-header">
+                <h2>Compare Plans</h2>
+                <p>Find the plan that works best for your business needs.</p>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Features</th>
+                            <th>Starter</th>
+                            <th>Professional</th>
+                            <th>Enterprise</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="feature-name">Monthly Authentications</td>
+                            <td class="limit">1,000</td>
+                            <td class="limit">10,000</td>
+                            <td class="limit">Unlimited</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Applications</td>
+                            <td class="limit">1</td>
+                            <td class="limit">5</td>
+                            <td class="limit">Unlimited</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">User Management</td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Custom User Roles</td>
+                            <td>—</td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Single Sign-On (SSO)</td>
+                            <td>—</td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Two-Factor Authentication</td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Military-Grade Encryption</td>
+                            <td>—</td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">API Access</td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Webhook Notifications</td>
+                            <td>—</td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Audit Logs</td>
+                            <td class="limit">7 Days</td>
+                            <td class="limit">30 Days</td>
+                            <td class="limit">1 Year</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Custom Branding</td>
+                            <td>—</td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">On-Premise Deployment</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">SLA Guarantee</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Dedicated Support</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td class="check"><i class="fas fa-check"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="reviews-section">
+        <div class="container">
+            <div class="reviews-header">
+                <h2>What Our Customers Say</h2>
+                <p>Join thousands of satisfied developers using Cozy Auth.</p>
+            </div>
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="review-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="review-text">"Implementing Cozy Auth took less than an hour and completely solved our authentication headaches. The military-grade security gives us peace of mind."</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">JD</div>
+                        <div class="reviewer-info">
+                            <h4>John Davis</h4>
+                            <div class="reviewer-company">CTO at TechFlow</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="review-text">"The zero-knowledge architecture was a major selling point for us. Our users appreciate that their data is truly secure and private."</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">SL</div>
+                        <div class="reviewer-info">
+                            <h4>Sarah Lee</h4>
+                            <div class="reviewer-company">Security Lead at PrivacyFirst</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="review-text">"Cozy Auth's enterprise plan has been a game-changer for our organization. The dedicated support team is responsive and the customization options are exactly what we needed."</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">RM</div>
+                        <div class="reviewer-info">
+                            <h4>Robert Miller</h4>
+                            <div class="reviewer-company">Director of IT at Global Solutions</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="review-text">"We switched from a competitor and couldn't be happier. The analytics dashboard gives us insights we never had before, and our users love the seamless login experience."</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">KT</div>
+                        <div class="reviewer-info">
+                            <h4>Kelly Thompson</h4>
+                            <div class="reviewer-company">Product Manager at NextGen Apps</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="reviews-dots">
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq-section">
+        <div class="container">
+            <div class="faq-header">
+                <h2>Frequently Asked Questions</h2>
+                <p>Everything you need to know about our pricing and products.</p>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3 class="faq-question">What happens if I exceed my monthly authentication limit?</h3>
+                    <p class="faq-answer">If you exceed your monthly authentication limit, you'll be charged a small overage fee for each additional authentication. We'll notify you when you reach 80% of your limit so you can upgrade if needed.</p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">Can I switch plans at any time?</h3>
+                    <p class="faq-answer">Yes, you can upgrade or downgrade your plan at any time. When upgrading, the change takes effect immediately. When downgrading, the change will take effect at the end of your current billing cycle.</p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">Do you offer a free trial?</h3>
+                    <p class="faq-answer">Yes, we offer a 14-day free trial on all paid plans. No credit card is required to start your trial, and you can cancel at any time.</p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">What payment methods do you accept?</h3>
+                    <p class="faq-answer">We accept all major credit cards, including Visa, MasterCard, American Express, and Discover. For Enterprise plans, we also accept wire transfers and purchase orders.</p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">Is there a setup fee?</h3>
+                    <p class="faq-answer">No, there are no setup fees for any of our plans. You only pay the advertised monthly or annual price.</p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">What kind of support can I expect?</h3>
+                    <p class="faq-answer">The Starter plan includes email support with a 24-hour response time. The Professional plan includes priority support with an 8-hour response time. The Enterprise plan includes 24/7 dedicated support with a dedicated account manager.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Get Started?</h2>
+            <p>Join thousands of companies that trust Cozy Auth for their authentication needs.</p>
+            <button class="cta-button">Start Your 14-Day Free Trial</button>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <a href="#" class="footer-logo"><span style="color: var(--primary);">Cozy</span> Auth</a>
+                    <p>The modern authentication solution for developers and enterprises. Secure, scalable, and easy to implement.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Security</a></li>
+                        <li><a href="#">Enterprise</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API Reference</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Guides</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Partners</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Security Policy</a></li>
+                        <li><a href="#">GDPR Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="bottom-bar">
+                <p>&copy; 2025 Cozy Auth. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        /* Additional animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shine {
+            from { background-position: -100px; }
+            to { background-position: 200px; }
+        }
+        
+        /* Apply animations to elements */
+        .pricing-hero-content h1 {
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .pricing-hero-content p {
+            animation: fadeIn 1s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+        
+        .pricing-toggle {
+            animation: fadeIn 1s ease-out 0.6s forwards;
+            opacity: 0;
+        }
+        
+        /* Fix animations to ensure cards remain visible */
+        .price-card {
+            opacity: 1; /* Ensure all cards are visible by default */
+        }
+        
+        .price-card:nth-child(1) {
+            animation: slideInLeft 1s ease-out 0.3s both;
+        }
+        
+        .price-card:nth-child(2) {
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+        
+        .price-card:nth-child(3) {
+            animation: slideInRight 1s ease-out 0.9s both;
+        }
+        
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100px;
+            width: 50px;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: skewX(-20deg);
+            animation: shine 3s infinite 2s;
+        }
+        
+        .price-card.popular {
+            animation: pulse 3s infinite;
+            animation-delay: 2s;
+        }
+        
+        /* Scroll animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Price toggle highlight effect */
+        .annual-highlight {
+            position: relative;
+        }
+        
+        .annual-highlight::after {
+            content: "SAVE 20%";
+            position: absolute;
+            top: -25px;
+            right: -15px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .annual-highlight.show::after {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+
+<script>
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle between monthly and annual billing
+        const billingToggle = document.getElementById('billing-toggle');
+        const monthlyLabel = document.querySelector('.toggle-label:first-child');
+        const annualLabel = document.querySelector('.toggle-label:last-child');
+        const priceAmounts = document.querySelectorAll('.price-amount');
+        const pricePeriods = document.querySelectorAll('.price-period');
+        
+        // Original monthly prices
+        const monthlyPrices = ['$29', '$99', 'Custom'];
+        // Annual prices (with 20% discount)
+        const annualPrices = ['$23', '$79', 'Custom'];
+        
+        billingToggle.addEventListener('change', function() {
+            if (this.checked) {
+                // Switch to annual
+                monthlyLabel.classList.remove('active');
+                annualLabel.classList.add('active');
+                
+                // Update prices and periods
+                priceAmounts.forEach((element, index) => {
+                    if (monthlyPrices[index] !== 'Custom') {
+                        element.innerHTML = annualPrices[index];
+                        // Add animation class
+                        element.classList.add('price-change');
+                        setTimeout(() => {
+                            element.classList.remove('price-change');
+                        }, 500);
+                    }
+                });
+                
+                // Update period text
+                pricePeriods.forEach((element, index) => {
+                    if (monthlyPrices[index] !== 'Custom') {
+                        element.innerHTML = 'per month, billed annually';
+                    }
+                });
+                
+            } else {
+                // Switch to monthly
+                annualLabel.classList.remove('active');
+                monthlyLabel.classList.add('active');
+                
+                // Reset to monthly prices
+                priceAmounts.forEach((element, index) => {
+                    if (monthlyPrices[index] !== 'Custom') {
+                        element.innerHTML = monthlyPrices[index];
+                        // Add animation class
+                        element.classList.add('price-change');
+                        setTimeout(() => {
+                            element.classList.remove('price-change');
+                        }, 500);
+                    }
+                });
+                
+                // Reset period text
+                pricePeriods.forEach((element, index) => {
+                    if (monthlyPrices[index] !== 'Custom') {
+                        element.innerHTML = 'per month';
+                    }
+                });
+            }
+        });
+
+        // Scroll animation for sections
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.compare-plans-header, .faq-header, .reviews-header, .faq-item, .review-card');
+            
+            reveals.forEach(element => {
+                const windowHeight = window.innerHeight;
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150; // adjust this value as needed
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    element.classList.add('reveal');
+                    element.classList.add('active');
+                }
+            });
+        }
+        
+        // Add reveal class to elements that should animate on scroll
+        document.querySelectorAll('.compare-plans-header, .faq-header, .reviews-header, .faq-item, .review-card').forEach(el => {
+            el.classList.add('reveal');
+        });
+        
+        // Run once on load
+        revealOnScroll();
+        
+        // Add event listener for scroll
+        window.addEventListener('scroll', revealOnScroll);
+        
+        // Reviews carousel functionality
+        const reviewDots = document.querySelectorAll('.dot');
+        const reviewsGrid = document.querySelector('.reviews-grid');
+        
+        reviewDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                // Remove active class from all dots
+                reviewDots.forEach(d => d.classList.remove('active'));
+                
+                // Add active class to clicked dot
+                dot.classList.add('active');
+                
+                // Calculate scroll position
+                const reviewWidth = document.querySelector('.review-card').offsetWidth + 30; // card width + gap
+                const scrollPosition = index * reviewWidth;
+                
+                // Smooth scroll to position
+                reviewsGrid.scrollTo({
+                    left: scrollPosition,
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Auto-scroll reviews every 5 seconds
+        let currentReviewIndex = 0;
+        
+        function autoScrollReviews() {
+            currentReviewIndex = (currentReviewIndex + 1) % reviewDots.length;
+            
+            // Remove active class from all dots
+            reviewDots.forEach(d => d.classList.remove('active'));
+            
+            // Add active class to current dot
+            reviewDots[currentReviewIndex].classList.add('active');
+            
+            // Calculate scroll position
+            const reviewWidth = document.querySelector('.review-card').offsetWidth + 30; // card width + gap
+            const scrollPosition = currentReviewIndex * reviewWidth;
+            
+            // Smooth scroll to position
+            reviewsGrid.scrollTo({
+                left: scrollPosition,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Start auto-scroll timer
+        const reviewTimer = setInterval(autoScrollReviews, 5000);
+        
+        // Pause auto-scroll when user interacts with reviews
+        reviewsGrid.addEventListener('mouseenter', () => {
+            clearInterval(reviewTimer);
+        });
+        
+        // Header animation on scroll
+        const header = document.querySelector('header');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.style.background = 'rgba(10, 10, 10, 0.95)';
+                header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.2)';
+            } else {
+                header.style.background = 'var(--darker)';
+                header.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+            }
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Add price change animation
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                @keyframes priceChange {
+                    0% { transform: translateY(0); opacity: 1; }
+                    50% { transform: translateY(-20px); opacity: 0; }
+                    51% { transform: translateY(20px); opacity: 0; }
+                    100% { transform: translateY(0); opacity: 1; }
+                }
+                
+                .price-change {
+                    animation: priceChange 0.5s ease;
+                }
+            </style>
+        `);
+        
+        // Add button hover effects
+        const ctaButtons = document.querySelectorAll('.cta-button');
+        
+        ctaButtons.forEach(button => {
+            button.addEventListener('mouseover', () => {
+                button.style.transform = 'translateY(-2px)';
+                button.style.boxShadow = '0 8px 15px rgba(75, 0, 130, 0.3)';
+            });
+            
+            button.addEventListener('mouseout', () => {
+                button.style.transform = '';
+                button.style.boxShadow = '';
+            });
+            
+            button.addEventListener('mousedown', () => {
+                button.style.transform = 'translateY(1px)';
+            });
+            
+            button.addEventListener('mouseup', () => {
+                button.style.transform = 'translateY(-2px)';
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy - Military-Grade Authentication</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8A2BE2;
+            --secondary: #4B0082;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --text: #f0f0f0;
+            --text-muted: #a0a0a0;
+            --accent: #32CD32;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: var(--darker);
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .logo span {
+            color: var(--primary);
+            margin-right: 8px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 32px;
+        }
+        
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(75, 0, 130, 0.3);
+        }
+        
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            background: radial-gradient(circle at 50% 50%, var(--darker), var(--dark));
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 80% 60%, rgba(50, 205, 50, 0.05) 0%, transparent 20%);
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+        }
+        
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+        
+        .hero h1 .highlight {
+            color: var(--primary);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .secondary-button {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .secondary-button:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .features {
+            padding: 120px 0;
+            background-color: var(--darker);
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .section-header p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 32px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 24px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .feature-card p {
+            color: var(--text-muted);
+        }
+        
+        .how-it-works {
+            padding: 120px 0;
+            background-color: var(--dark);
+        }
+        
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+            margin-top: 64px;
+        }
+        
+        .step {
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .step-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .step-content p {
+            color: var(--text-muted);
+        }
+        
+        .code-sample {
+            background-color: var(--darker);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        
+        .code-sample pre {
+            color: #e0e0e0;
+        }
+        
+        .code-sample .comment {
+            color: #6c757d;
+        }
+        
+        .code-sample .keyword {
+            color: #569cd6;
+        }
+        
+        .code-sample .string {
+            color: #ce9178;
+        }
+        
+        .code-sample .function {
+            color: #dcdcaa;
+        }
+        
+        .pricing {
+            padding: 120px 0;
+            background-color: var(--darker);
+        }
+        
+        .pricing-plans {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-top: 64px;
+        }
+        
+        .pricing-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        
+        .popular {
+            border: 2px solid var(--primary);
+            position: relative;
+        }
+        
+        .popular::after {
+            content: "Most Popular";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .pricing-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        
+        .price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+        
+        .price span {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+        
+        .features-list {
+            list-style: none;
+            margin-bottom: 32px;
+            flex-grow: 1;
+        }
+        
+        .features-list li {
+            padding: 8px 0;
+            color: var(--text-muted);
+        }
+        
+        .features-list li::before {
+            content: "✓";
+            color: var(--accent);
+            margin-right: 8px;
+        }
+        
+        .cta {
+            padding: 120px 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            text-align: center;
+        }
+        
+        .cta h2 {
+            font-size: 3rem;
+            margin-bottom: 24px;
+        }
+        
+        .cta p {
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        
+        .cta .cta-button {
+            background-color: white;
+            color: var(--secondary);
+        }
+        
+        footer {
+            background-color: var(--darker);
+            padding: 80px 0 40px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+        
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: block;
+        }
+        
+        .footer-info p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .social-links a {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: var(--primary);
+        }
+        
+        .footer-links h4 {
+            font-size: 1.2rem;
+            margin-bottom: 24px;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--text);
+        }
+        
+        .bottom-bar {
+            padding-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .code-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 4px 12px;
+            margin-right: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .secure-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(50, 205, 50, 0.1);
+            color: var(--accent);
+            border-radius: 20px;
+            padding: 8px 16px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+            
+            .step {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-inner">
+            <a href="/index.html" class="logo"><span>Cozy</span> Auth</a>
+            <nav class="nav-links">
+                <a href="/features.html">Features</a>
+                <a href="/how-it-works">How It Works</a>
+                <a href="/pricing">Pricing</a>
+                <a href="#docs">Documentation</a>
+            </nav>
+            <button class="cta-button">Get Started</button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="secure-badge">
+                <i class="fas fa-shield-alt"></i>
+                Military-Grade Security
+            </div>
+            <h1>Privacy First Authentication</span> For Developers</h1>
+            <p>Cozy provides a seamless, secure authentication system with a simple DLL integration. No compromises on privacy, no data leaks, just reliable authentication that puts your users first.</p>
+            <div class="hero-buttons">
+                <button class="cta-button">Download SDK</button>
+                <button class="secondary-button">View Documentation</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Choose Cozy?</h2>
+                <p>We've built the most secure, privacy-focused authentication system on the market.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3>Military-Grade Encryption</h3>
+                    <p>AES-256 encryption for all data in transit and at rest. Your data never leaves our secure environment unencrypted.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Zero Knowledge Architecture</h3>
+                    <p>We can't access your users' data even if we wanted to. Complete privacy by design, not as an afterthought.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>Seamless Integration</h3>
+                    <p>Our DLL makes API calls automatically, with just a few lines of code to get started. Works with any language.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3>Distributed Infrastructure</h3>
+                    <p>No single point of failure means your authentication system stays online even during attacks.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h3>Ultra-Low Latency</h3>
+                    <p>Authentication in under 50ms from anywhere in the world with our global edge network.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Real-time Analytics</h3>
+                    <p>Monitor authentication attempts, user activity, and potential security threats from your dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2>How Cozy Works</h2>
+                <p>Get started with just a few lines of code. It's that simple.</p>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Download the Cozy DLL</h3>
+                        <p>Get our lightweight DLL and add it to your project. Supports C++, C#, Python, and more.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Initialize with Your API Key</h3>
+                        <p>Create an account, get your API key, and initialize Cozy in your application.</p>
+                        <div class="code-sample">
+                            <pre><span class="comment">// C# Example</span>
+<span class="keyword">using</span> Cozy.Auth;
+
+<span class="keyword">var</span> auth = <span class="keyword">new</span> <span class="function">CozyClient</span>(<span class="string">"YOUR_API_KEY"</span>);
+<span class="keyword">bool</span> isValid = <span class="keyword">await</span> auth.<span class="function">ValidateLicense</span>(license, username);</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Let Cozy Handle the Rest</h3>
+                        <p>Our DLL handles all API calls, encryption, and authentication flows automatically. No more authentication headaches.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-header">
+                <h2>Simple, Transparent Pricing</h2>
+                <p>Pay only for what you use, with no hidden fees or long-term contracts.</p>
+            </div>
+            <div class="pricing-plans">
+                <div class="pricing-card">
+                    <h3>Starter</h3>
+                    <div class="price">$29<span>/month</span></div>
+                    <ul class="features-list">
+                        <li>Up to 1,000 monthly authentications</li>
+                        <li>Basic analytics dashboard</li>
+                        <li>Email support</li>
+                        <li>Standard encryption</li>
+                        <li>1 application</li>
+                    </ul>
+                    <button class="cta-button">Get Started</button>
+                </div>
+                <div class="pricing-card popular">
+                    <h3>Professional</h3>
+                    <div class="price">$99<span>/month</span></div>
+                    <ul class="features-list">
+                        <li>Up to 10,000 monthly authentications</li>
+                        <li>Advanced analytics & reporting</li>
+                        <li>Priority support</li>
+                        <li>Military-grade encryption</li>
+                        <li>5 applications</li>
+                        <li>Custom user roles</li>
+                    </ul>
+                    <button class="cta-button">Get Started</button>
+                </div>
+                <div class="pricing-card">
+                    <h3>Enterprise</h3>
+                    <div class="price">Custom</div>
+                    <ul class="features-list">
+                        <li>Unlimited authentications</li>
+                        <li>Enterprise-grade analytics</li>
+                        <li>24/7 dedicated support</li>
+                        <li>Custom encryption options</li>
+                        <li>Unlimited applications</li>
+                        <li>On-premise deployment available</li>
+                        <li>SLA guarantees</li>
+                    </ul>
+                    <button class="cta-button">Contact Sales</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Secure Your Application?</h2>
+            <p>Join thousands of developers who trust Cozy for their authentication needs.</p>
+            <button class="cta-button">Get Started for Free</button>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <a href="#" class="footer-logo">Cozy</a>
+                    <p>Military-grade authentication that values privacy and security above all else.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API Reference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Security</a></li>
+                        <li><a href="#">Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="bottom-bar">
+                <p>&copy; 2025 Cozy Authentication. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Display loading animation
+            const body = document.body;
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.style.position = 'fixed';
+            loadingOverlay.style.top = '0';
+            loadingOverlay.style.left = '0';
+            loadingOverlay.style.width = '100%';
+            loadingOverlay.style.height = '100%';
+            loadingOverlay.style.backgroundColor = 'var(--darker)';
+            loadingOverlay.style.display = 'flex';
+            loadingOverlay.style.justifyContent = 'center';
+            loadingOverlay.style.alignItems = 'center';
+            loadingOverlay.style.zIndex = '9999';
+            loadingOverlay.style.transition = 'opacity 0.5s ease-out';
+            
+            const spinner = document.createElement('div');
+            spinner.innerHTML = `
+                <svg width="50" height="50" viewBox="0 0 50 50">
+                    <circle cx="25" cy="25" r="20" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round" stroke-dasharray="94.2" stroke-dashoffset="0">
+                        <animateTransform attributeName="transform" type="rotate" dur="1s" from="0 25 25" to="360 25 25" repeatCount="indefinite" />
+                        <animate attributeName="stroke-dashoffset" values="0;94.2;0" dur="2s" repeatCount="indefinite" />
+                    </circle>
+                </svg>
+            `;
+            
+            loadingOverlay.appendChild(spinner);
+            body.appendChild(loadingOverlay);
+            
+            // Hide loading animation after content loads
+            window.addEventListener('load', function() {
+                setTimeout(() => {
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingOverlay.remove();
+                    }, 500);
+                }, 800);
+            });
+            
+            // Initialize smooth scroll
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            
+            // Custom cursor effect
+            const cursor = document.createElement('div');
+            const cursorDot = document.createElement('div');
+            
+            cursor.classList.add('cursor');
+            cursorDot.classList.add('cursor-dot');
+            
+            cursor.style.position = 'fixed';
+            cursor.style.width = '40px';
+            cursor.style.height = '40px';
+            cursor.style.borderRadius = '50%';
+            cursor.style.border = '2px solid rgba(138, 43, 226, 0.5)';
+            cursor.style.pointerEvents = 'none';
+            cursor.style.transform = 'translate(-50%, -50%)';
+            cursor.style.transition = 'width 0.3s, height 0.3s, border-color 0.3s';
+            cursor.style.zIndex = '9998';
+            
+            cursorDot.style.position = 'fixed';
+            cursorDot.style.width = '8px';
+            cursorDot.style.height = '8px';
+            cursorDot.style.borderRadius = '50%';
+            cursorDot.style.backgroundColor = 'var(--primary)';
+            cursorDot.style.pointerEvents = 'none';
+            cursorDot.style.transform = 'translate(-50%, -50%)';
+            cursorDot.style.zIndex = '9999';
+            
+            document.body.appendChild(cursor);
+            document.body.appendChild(cursorDot);
+            
+            document.addEventListener('mousemove', function(e) {
+                gsap.to(cursor, {
+                    x: e.clientX,
+                    y: e.clientY,
+                    duration: 0.15
+                });
+                
+                gsap.to(cursorDot, {
+                    x: e.clientX,
+                    y: e.clientY,
+                    duration: 0.1
+                });
+            });
+            
+            document.addEventListener('mousedown', function() {
+                cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                cursor.style.borderColor = 'rgba(138, 43, 226, 1)';
+            });
+            
+            document.addEventListener('mouseup', function() {
+                cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+                cursor.style.borderColor = 'rgba(138, 43, 226, 0.5)';
+            });
+            
+            // Add hover effects for interactive elements
+            document.querySelectorAll('a, button, .feature-card').forEach(el => {
+                el.addEventListener('mouseenter', function() {
+                    cursor.style.width = '60px';
+                    cursor.style.height = '60px';
+                    cursor.style.borderColor = 'rgba(50, 205, 50, 0.8)';
+                    cursorDot.style.backgroundColor = 'var(--accent)';
+                });
+                
+                el.addEventListener('mouseleave', function() {
+                    cursor.style.width = '40px';
+                    cursor.style.height = '40px';
+                    cursor.style.borderColor = 'rgba(138, 43, 226, 0.5)';
+                    cursorDot.style.backgroundColor = 'var(--primary)';
+                });
+            });
+            
+            // Particle background effect
+            const particleContainer = document.createElement('div');
+            particleContainer.style.position = 'fixed';
+            particleContainer.style.top = '0';
+            particleContainer.style.left = '0';
+            particleContainer.style.width = '100%';
+            particleContainer.style.height = '100%';
+            particleContainer.style.overflow = 'hidden';
+            particleContainer.style.zIndex = '1';
+            document.body.prepend(particleContainer);
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.borderRadius = '50%';
+                
+                const size = Math.random() * 5 + 1;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                particle.style.left = x + '%';
+                particle.style.top = y + '%';
+                
+                const duration = Math.random() * 60 + 30;
+                const delay = Math.random() * 60;
+                
+                particle.style.backgroundColor = 'rgba(138, 43, 226, 0.15)';
+                particle.style.animation = `float ${duration}s ${delay}s linear infinite`;
+                
+                particleContainer.appendChild(particle);
+            }
+            
+            // Add floating animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes float {
+                    0% {
+                        transform: translate(0, 0);
+                        opacity: 0;
+                    }
+                    10% {
+                        opacity: 0.2;
+                    }
+                    90% {
+                        opacity: 0.2;
+                    }
+                    100% {
+                        transform: translate(${Math.random() > 0.5 ? '+' : '-'}50px, -70vh);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Typing animation for hero text
+            const heroH1 = document.querySelector('.hero h1');
+            const originalText = heroH1.innerHTML;
+            heroH1.innerHTML = '';
+            
+            function typeWriter(text, element, i = 0) {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(() => typeWriter(text, element, i), 50);
+                }
+            }
+            
+            setTimeout(() => {
+                typeWriter(originalText, heroH1);
+            }, 1000);
+            
+            // Reveal animations on scroll
+            const revealElements = document.querySelectorAll('.feature-card, .step, .pricing-card');
+            
+            const revealOnScroll = function() {
+                for (let i = 0; i < revealElements.length; i++) {
+                    const windowHeight = window.innerHeight;
+                    const elementTop = revealElements[i].getBoundingClientRect().top;
+                    const elementVisible = 150;
+                    
+                    if (elementTop < windowHeight - elementVisible) {
+                        revealElements[i].classList.add('active');
+                        revealElements[i].style.opacity = '1';
+                        revealElements[i].style.transform = 'translateY(0)';
+                    }
+                }
+            };
+            
+            // Initial setup for reveal animations
+            revealElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            });
+            
+            window.addEventListener('scroll', revealOnScroll);
+            revealOnScroll(); // Check on page load
+            
+            // Add GSAP for smoother animations
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js';
+            document.head.appendChild(script);
+            
+            script.onload = function() {
+                // Nav animations
+                gsap.from('.logo', {
+                    duration: 1,
+                    y: -50,
+                    opacity: 0,
+                    delay: 0.5
+                });
+                
+                gsap.from('.nav-links a', {
+                    duration: 0.8,
+                    y: -50,
+                    opacity: 0,
+                    stagger: 0.1,
+                    delay: 0.8
+                });
+                
+                // Feature card hover animations
+                document.querySelectorAll('.feature-card').forEach(card => {
+                    card.addEventListener('mouseenter', function() {
+                        gsap.to(this, {
+                            y: -10,
+                            boxShadow: '0 15px 30px rgba(0,0,0,0.3)',
+                            duration: 0.3
+                        });
+                        
+                        gsap.to(this.querySelector('.feature-icon'), {
+                            scale: 1.2,
+                            duration: 0.3
+                        });
+                    });
+                    
+                    card.addEventListener('mouseleave', function() {
+                        gsap.to(this, {
+                            y: 0,
+                            boxShadow: '0 12px 24px rgba(0,0,0,0.2)',
+                            duration: 0.3
+                        });
+                        
+                        gsap.to(this.querySelector('.feature-icon'), {
+                            scale: 1,
+                            duration: 0.3
+                        });
+                    });
+                });
+                
+                // Button hover effects
+                document.querySelectorAll('.cta-button, .secondary-button').forEach(button => {
+                    button.addEventListener('mouseenter', function() {
+                        gsap.to(this, {
+                            scale: 1.05,
+                            duration: 0.2
+                        });
+                    });
+                    
+                    button.addEventListener('mouseleave', function() {
+                        gsap.to(this, {
+                            scale: 1,
+                            duration: 0.2
+                        });
+                    });
+                    
+                    button.addEventListener('mousedown', function() {
+                        gsap.to(this, {
+                            scale: 0.95,
+                            duration: 0.1
+                        });
+                    });
+                    
+                    button.addEventListener('mouseup', function() {
+                        gsap.to(this, {
+                            scale: 1.05,
+                            duration: 0.1
+                        });
+                    });
+                });
+                
+                // Add glitch effect to logo
+                const logoElement = document.querySelector('.logo');
+                logoElement.addEventListener('mouseenter', function() {
+                    let iterations = 0;
+                    
+                    const glitchInterval = setInterval(() => {
+                        const originalText = "Cozy Auth";
+                        const glitchChars = "!<>-_\\/[]{}—=+*^?#________";
+                        
+                        logoElement.innerHTML = originalText
+                            .split("")
+                            .map((char, index) => {
+                                if (index < 4 && Math.random() < 0.3) {
+                                    return glitchChars[Math.floor(Math.random() * glitchChars.length)];
+                                }
+                                return char;
+                            })
+                            .join("");
+                        
+                        iterations++;
+                        if (iterations > 10) {
+                            clearInterval(glitchInterval);
+                            logoElement.innerHTML = "<span>Cozy</span> Auth";
+                        }
+                    }, 100);
+                });
+            };
+            
+            // Initialize "Matrix rain" effect in the background of code samples
+            document.querySelectorAll('.code-sample').forEach(sample => {
+                const canvas = document.createElement('canvas');
+                canvas.style.position = 'absolute';
+                canvas.style.top = '0';
+                canvas.style.left = '0';
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+                canvas.style.opacity = '0.05';
+                canvas.style.pointerEvents = 'none';
+                canvas.style.zIndex = '0';
+                
+                sample.style.position = 'relative';
+                sample.prepend(canvas);
+                
+                const ctx = canvas.getContext('2d');
+                const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                
+                canvas.width = sample.clientWidth;
+                canvas.height = sample.clientHeight;
+                
+                const fontSize = 10;
+                const columns = canvas.width / fontSize;
+                
+                const drops = [];
+                for (let i = 0; i < columns; i++) {
+                    drops[i] = 1;
+                }
+                
+                function draw() {
+                    ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    ctx.fillStyle = '#8A2BE2';
+                    ctx.font = fontSize + 'px monospace';
+                    
+                    for (let i = 0; i < drops.length; i++) {
+                        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                        
+                        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                            drops[i] = 0;
+                        }
+                        
+                        drops[i]++;
+                    }
+                }
+                
+                setInterval(draw, 33);
+            });
+        });
+    </script>
+</body>
+</html>

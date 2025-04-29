@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy - Login & Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8A2BE2;
+            --secondary: #4B0082;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --text: #f0f0f0;
+            --text-muted: #a0a0a0;
+            --accent: #32CD32;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 0 20px;
+        }
+        
+        .auth-card {
+            background-color: var(--darker);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(138, 43, 226, 0.1), transparent 60%);
+            z-index: 0;
+        }
+        
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        
+        .logo span {
+            color: var(--primary);
+        }
+        
+        .secure-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(50, 205, 50, 0.1);
+            color: var(--accent);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .form-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 24px;
+        }
+        
+        .tab {
+            padding: 8px 16px;
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            color: var(--text-muted);
+        }
+        
+        .tab.active {
+            color: var(--text);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .form {
+            display: none;
+        }
+        
+        .form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-group i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        
+        .form-control {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 12px 12px 40px;
+            border-radius: 6px;
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .toggle-password:hover {
+            color: var(--text);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(75, 0, 130, 0.3);
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 24px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .form-footer a:hover {
+            color: var(--accent);
+        }
+        
+        .status-message {
+            padding: 10px;
+            margin-top: 20px;
+            text-align: center;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .success {
+            background-color: rgba(50, 205, 50, 0.2);
+            color: var(--accent);
+            display: block;
+        }
+        
+        .error {
+            background-color: rgba(220, 20, 60, 0.2);
+            color: #ff6b6b;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="auth-card">
+            <div class="card-content">
+                <div class="header">
+                    <div class="logo"><span>Cozy</span> Auth</div>
+                    <div class="secure-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        Military-Grade Security
+                    </div>
+                    <h2>Welcome Back</h2>
+                </div>
+                
+                <div class="form-tabs">
+                    <div class="tab active" data-tab="login">Login</div>
+                    <div class="tab" data-tab="register">Register</div>
+                </div>
+                
+                <form class="form login-form active" id="loginForm">
+                    <div class="form-group">
+                        <label for="login-username">Username</label>
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" class="form-control" id="login-username" placeholder="Enter your username">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" class="form-control" id="login-password" placeholder="Enter your password">
+                            <i class="far fa-eye toggle-password"></i>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Sign In</button>
+                    
+                    <div id="login-status" class="status-message"></div>
+                    
+                    <div class="form-footer">
+                        <p>Don't have an account? <a href="#" class="switch-form" data-form="register">Register now</a></p>
+                    </div>
+                </form>
+                
+                <form class="form register-form" id="registerForm">
+                    <div class="form-group">
+                        <label for="register-username">Username</label>
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" class="form-control" id="register-username" placeholder="Choose a username">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" class="form-control" id="register-email" placeholder="Enter your email">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" class="form-control" id="register-password" placeholder="Create a password">
+                            <i class="far fa-eye toggle-password"></i>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Create Account</button>
+                    
+                    <div id="register-status" class="status-message"></div>
+                    
+                    <div class="form-footer">
+                        <p>Already have an account? <a href="#" class="switch-form" data-form="login">Sign in</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching
+            const tabs = document.querySelectorAll('.tab');
+            const forms = document.querySelectorAll('.form');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    forms.forEach(f => f.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.querySelector(`.${tabName}-form`).classList.add('active');
+                    
+                    if (tabName === 'login') {
+                        document.querySelector('.header h2').textContent = 'Welcome Back';
+                    } else {
+                        document.querySelector('.header h2').textContent = 'Create Account';
+                    }
+                });
+            });
+            
+            // Form switching links
+            document.querySelectorAll('.switch-form').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const formName = this.getAttribute('data-form');
+                    document.querySelector(`[data-tab="${formName}"]`).click();
+                });
+            });
+            
+            // Password visibility toggle
+            document.querySelectorAll('.toggle-password').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const input = this.previousElementSibling;
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        this.classList.remove('fa-eye');
+                        this.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        this.classList.remove('fa-eye-slash');
+                        this.classList.add('fa-eye');
+                    }
+                });
+            });
+            
+            // Login form submission
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('login-username').value;
+                const password = document.getElementById('login-password').value;
+                const statusMessage = document.getElementById('login-status');
+                
+                if (!username || !password) {
+                    statusMessage.textContent = 'Please fill in all fields';
+                    statusMessage.className = 'status-message error';
+                    return;
+                }
+                
+                // Check if user exists in localStorage
+                const storedUser = localStorage.getItem(username);
+                
+                if (storedUser) {
+                    const user = JSON.parse(storedUser);
+                    
+                    if (user.password === password) {
+                        // Generate auth token (in a real app, this would be done on the server)
+                        const authToken = Array.from(Array(32), () => Math.floor(Math.random() * 36).toString(36)).join('');
+                        
+                        // Update user with auth token
+                        user.authToken = authToken;
+                        localStorage.setItem(username, JSON.stringify(user));
+                        
+                        // Set current user
+                        localStorage.setItem('currentUser', username);
+                        
+                        statusMessage.textContent = 'Login successful! Redirecting...';
+                        statusMessage.className = 'status-message success';
+                        
+                        // In a real app, you would redirect to a dashboard
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 1500);
+                    } else {
+                        statusMessage.textContent = 'Incorrect password';
+                        statusMessage.className = 'status-message error';
+                    }
+                } else {
+                    statusMessage.textContent = 'User not found';
+                    statusMessage.className = 'status-message error';
+                }
+            });
+            
+            // Register form submission
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('register-username').value;
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const statusMessage = document.getElementById('register-status');
+                
+                if (!username || !email || !password) {
+                    statusMessage.textContent = 'Please fill in all fields';
+                    statusMessage.className = 'status-message error';
+                    return;
+                }
+                
+                // Check if username already exists
+                if (localStorage.getItem(username)) {
+                    statusMessage.textContent = 'Username already taken';
+                    statusMessage.className = 'status-message error';
+                    return;
+                }
+                
+                // Generate auth token (in a real app, this would be done on the server)
+                const authToken = Array.from(Array(32), () => Math.floor(Math.random() * 36).toString(36)).join('');
+                
+                // Store user in localStorage
+                const user = {
+                    username,
+                    email,
+                    password,
+                    authToken,
+                    createdAt: new Date().toISOString()
+                };
+                
+                localStorage.setItem(username, JSON.stringify(user));
+                
+                // Set current user
+                localStorage.setItem('currentUser', username);
+                
+                statusMessage.textContent = 'Account created successfully! Redirecting...';
+                statusMessage.className = 'status-message success';
+                
+                // In a real app, you would redirect to a dashboard
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            });
+            
+            // Add floating particles
+            const particleContainer = document.createElement('div');
+            particleContainer.style.position = 'fixed';
+            particleContainer.style.top = '0';
+            particleContainer.style.left = '0';
+            particleContainer.style.width = '100%';
+            particleContainer.style.height = '100%';
+            particleContainer.style.overflow = 'hidden';
+            particleContainer.style.zIndex = '-1';
+            document.body.prepend(particleContainer);
+            
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.borderRadius = '50%';
+                
+                const size = Math.random() * 4 + 1;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                particle.style.left = x + '%';
+                particle.style.top = y + '%';
+                
+                const duration = Math.random() * 60 + 30;
+                const delay = Math.random() * 60;
+                
+                particle.style.backgroundColor = 'rgba(138, 43, 226, 0.15)';
+                particle.style.animation = `float ${duration}s ${delay}s linear infinite`;
+                
+                particleContainer.appendChild(particle);
+            }
+            
+            // Add floating animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes float {
+                    0% {
+                        transform: translate(0, 0);
+                        opacity: 0;
+                    }
+                    10% {
+                        opacity: 0.2;
+                    }
+                    90% {
+                        opacity: 0.2;
+                    }
+                    100% {
+                        transform: translate(${Math.random() > 0.5 ? '+' : '-'}50px, -70vh);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

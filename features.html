@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy - Features</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8A2BE2;
+            --secondary: #4B0082;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --text: #f0f0f0;
+            --text-muted: #a0a0a0;
+            --accent: #32CD32;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: var(--darker);
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .logo span {
+            color: var(--primary);
+            margin-right: 8px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 32px;
+        }
+        
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(75, 0, 130, 0.3);
+        }
+        
+        .page-header {
+            padding-top: 140px;
+            padding-bottom: 60px;
+            background: radial-gradient(circle at 50% 50%, var(--darker), var(--dark));
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+        
+        .page-header p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            margin: 60px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .feature-icon i {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        
+        .feature-card .learn-more {
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+            transition: gap 0.3s ease;
+        }
+        
+        .feature-card .learn-more:hover {
+            gap: 10px;
+        }
+        
+        .security-section {
+            padding: 80px 0;
+            background-color: var(--darker);
+        }
+        
+        .security-content {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+        
+        .security-text {
+            flex: 1;
+        }
+        
+        .security-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .security-text p {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+        
+        .security-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .security-badge {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .security-badge i {
+            color: var(--accent);
+        }
+        
+        .security-visual {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .security-visual .lock-graphic {
+            width: 100%;
+            height: 400px;
+            background: radial-gradient(circle at center, rgba(138, 43, 226, 0.15), transparent 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .security-visual .lock-icon {
+            font-size: 8rem;
+            color: var(--primary);
+            animation: pulse 3s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 0.7;
+                transform: scale(0.95);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            100% {
+                opacity: 0.7;
+                transform: scale(0.95);
+            }
+        }
+        
+        .security-visual .ring {
+            position: absolute;
+            border: 2px solid rgba(138, 43, 226, 0.2);
+            border-radius: 50%;
+            animation: ripple 4s infinite;
+        }
+        
+        .security-visual .ring:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            animation-delay: 0s;
+        }
+        
+        .security-visual .ring:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            animation-delay: 1s;
+        }
+        
+        .security-visual .ring:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            animation-delay: 2s;
+        }
+        
+        @keyframes ripple {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.2);
+            }
+        }
+        
+        .integrations {
+            padding: 80px 0;
+        }
+        
+        .integration-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 60px;
+        }
+        
+        .integration-logo {
+            width: 120px;
+            height: 80px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .integration-logo:hover {
+            transform: translateY(-5px);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .integration-logo i {
+            font-size: 2.5rem;
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+        }
+        
+        .integration-logo:hover i {
+            color: var(--text);
+        }
+        
+        .comparison {
+            padding: 80px 0;
+            background-color: var(--darker);
+        }
+        
+        .comparison-table {
+            width: 100%;
+            margin-top: 60px;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 16px 24px;
+            text-align: left;
+        }
+        
+        .comparison-table th {
+            background-color: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+        
+        .comparison-table td:first-child {
+            font-weight: 500;
+        }
+        
+        .comparison-table .check {
+            color: var(--accent);
+        }
+        
+        .comparison-table .x {
+            color: #ff4444;
+        }
+        
+        .comparison-table .cozy-column {
+            background-color: rgba(138, 43, 226, 0.05);
+        }
+        
+        .cta-section {
+            padding: 80px 0;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .cta-section p {
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        .cta-section .cta-button {
+            background-color: white;
+            color: var(--secondary);
+        }
+        
+        footer {
+            background-color: var(--darker);
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .footer-info p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: block;
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .footer-logo span {
+            color: var(--primary);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .social-links a {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: var(--primary);
+        }
+        
+        .footer-links h4 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--text);
+        }
+        
+        .bottom-bar {
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .security-content {
+                flex-direction: column;
+            }
+            
+            .comparison-table {
+                overflow-x: auto;
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-inner">
+            <a href="index.html" class="logo"><span>Cozy</span> Auth</a>
+            <nav class="nav-links">
+                <a href="/index.html">Home</a>
+                <a href="features.html" class="active">Features</a>
+                <a href="pricing.html">Pricing</a>
+                <a href="#">Documentation</a>
+            </nav>
+            <button class="cta-button">Get Started</button>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Military-Grade Authentication Features</h1>
+            <p>Discover why Cozy is the most secure authentication solution on the market.</p>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                        <span>Encryption</span>
+                    </div>
+                    <h3>End-to-End Encryption</h3>
+                    <p>AES-256 bit encryption for all data in transit and at rest. Your credentials never leave our secure environment unencrypted.</p>
+                    
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Zero Knowledge</span>
+                    </div>
+                    <h3>Zero Knowledge Architecture</h3>
+                    <p>We can't access your users' credentials even if we wanted to. Your data remains yours alone at all times.</p>
+                    
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-code"></i>
+                        <span>DLL Integration</span>
+                    </div>
+                    <h3>Simple DLL Integration</h3>
+                    <p>Our lightweight DLL handles all API calls automatically. Just a few lines of code to get started, and you're protected.</p>
+                    
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-server"></i>
+                        <span>Distributed</span>
+                    </div>
+                    <h3>Distributed Infrastructure</h3>
+                    <p>No single point of failure with our globally distributed authentication network. Stay online even under attack.</p>
+                    
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Anti-Tampering</span>
+                    </div>
+                    <h3>Anti-Tampering Protection</h3>
+                    <p>Built-in protection against reverse engineering and debugging attempts. Keep your application secure from hackers.</p>
+                    
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </div>
+                    <h3>Real-time Threat Analytics</h3>
+                    <p>Monitor authentication attempts and potential security threats from your dashboard in real-time.</p>
+                    
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="security-section">
+        <div class="container">
+            <div class="security-content">
+                <div class="security-text">
+                    <h2>Military-Grade Security</h2>
+                    <p>Cozy's authentication system is built with the same security standards used by military and government agencies worldwide.</p>
+                    
+                    <div class="security-badges">
+                        <div class="security-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>AES-256 Encryption</span>
+                        </div>
+                        <div class="security-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>NIST Compliant</span>
+                        </div>
+                        <div class="security-badge">
+                            <i class="fas fa-lock"></i>
+                            <span>Zero Knowledge</span>
+                        </div>
+                        <div class="security-badge">
+                            <i class="fas fa-user-secret"></i>
+                            <span>Privacy First</span>
+                        </div>
+                    </div>
+                    
+                    <button class="cta-button">Learn About Our Security</button>
+                </div>
+                
+                <div class="security-visual">
+                    <div class="lock-graphic">
+                        <div class="ring"></div>
+                        <div class="ring"></div>
+                        <div class="ring"></div>
+                        <i class="fas fa-shield-alt lock-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="integrations">
+        <div class="container">
+            <div class="section-header" style="text-align: center; margin-bottom: 40px;">
+                <h2>Seamless Integrations</h2>
+                <p>Cozy works with all major platforms and programming languages.</p>
+            </div>
+            
+            <div class="integration-logos">
+                <div class="integration-logo">
+                    <i class="fab fa-windows"></i>
+                </div>
+                <div class="integration-logo">
+                    <i class="fab fa-apple"></i>
+                </div>
+                <div class="integration-logo">
+                    <i class="fab fa-linux"></i>
+                </div>
+                <div class="integration-logo">
+                    <i class="fab fa-android"></i>
+                </div>
+                <div class="integration-logo">
+                    <i class="fab fa-js"></i>
+                </div>
+                <div class="integration-logo">
+                    <i class="fab fa-python"></i>
+                </div>
+                <div class="integration-logo">
+                    <i class="fab fa-java"></i>
+                </div>
+                <div class="integration-logo">
+                    <i class="fab fa-php"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="comparison">
+        <div class="container">
+            <div class="section-header" style="text-align: center; margin-bottom: 40px;">
+                <h2>Cozy vs Competition</h2>
+                <p>See how Cozy stacks up against other authentication providers.</p>
+            </div>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th class="cozy-column">Cozy</th>
+                        <th>KeyAuth</th>
+                        <th>Others</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Military-Grade Encryption</td>
+                        <td class="cozy-column"><i class="fas fa-check check"></i></td>
+                        <td><i class="fas fa-times x"></i></td>
+                        <td><i class="fas fa-times x"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Zero Knowledge Architecture</td>
+                        <td class="cozy-column"><i class="fas fa-check check"></i></td>
+                        <td><i class="fas fa-times x"></i></td>
+                        <td><i class="fas fa-times x"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Anti-Tampering Protection</td>
+                        <td class="cozy-column"><i class="fas fa-check check"></i></td>
+                        <td><i class="fas fa-check check"></i></td>
+                        <td><i class="fas fa-times x"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Simple DLL Integration</td>
+                        <td class="cozy-column"><i class="fas fa-check check"></i></td>
+                        <td><i class="fas fa-check check"></i></td>
+                        <td><i class="fas fa-times x"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Distributed Infrastructure</td>
+                        <td class="cozy-column"><i class="fas fa-check check"></i></td>
+                        <td><i class="fas fa-times x"></i></td>
+                        <td><i class="fas fa-check check"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Real-time Threat Analytics</td>
+                        <td class="cozy-column"><i class="fas fa-check check"></i></td>
+                        <td><i class="fas fa-times x"></i></td>
+                        <td><i class="fas fa-check check"></i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Secure Your Application?</h2>
+            <p>Join thousands of developers who trust Cozy for their authentication needs.</p>
+            <button class="cta-button">Get Started For Free</button>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <a href="#" class="footer-logo"><span>Cozy</span> Auth</a>
+                    <p>Military-grade authentication that values privacy and security above all else.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API Reference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Security</a></li>
+                        <li><a href="#">Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="bottom-bar">
+                <p>&copy; 2025 Cozy Authentication. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <script>
+        // Animation for feature cards
+        gsap.registerPlugin()
+        document.querySelectorAll('.feature-card').forEach((card, index) => {
+            gsap.from(card, {
+                y: 30,
+                opacity: 0,
+                duration: 0.6,
+                delay: 0.2 + (index * 0.1),
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 80%"
+                }
+            });
+            
+            card.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    y: -10,
+                    boxShadow: '0 15px 30px rgba(0,0,0,0.3)',
+                    duration: 0.3
+                });
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    y: 0,
+                    boxShadow: '0 12px 24px rgba(0,0,0,0.2)',
+                    duration: 0.3
+                });
+            });
+        });
+        
+        // Security visual animation
+        const securityVisual = document.querySelector('.security-visual');
+        if (securityVisual) {
+            gsap.from(securityVisual, {
+                opacity: 0,
+                duration: 1,
+                delay: 0.5,
+                scrollTrigger: {
+                    trigger: securityVisual,
+                    start: "top 70%"
+                }
+            });
+        }
+        
+        // Button hover effects
+        document.querySelectorAll('.cta-button').forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    scale: 1.05,
+                    duration: 0.2
+                });
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    scale: 1,
+                    duration: 0.2
+                });
+            });
+        });
+        
+        // Custom cursor effect (simplified version)
+        const cursor = document.createElement('div');
+        cursor.style.position = 'fixed';
+        cursor.style.width = '20px';
+        cursor.style.height = '20px';
+        cursor.style.borderRadius = '50%';
+        cursor.style.backgroundColor = 'rgba(138, 43, 226, 0.3)';
+        cursor.style.pointerEvents = 'none';
+        cursor.style.transform = 'translate(-50%, -50%)';
+        cursor.style.zIndex = '9999';
+        cursor.style.transition = 'width 0.2s, height 0.2s, background-color 0.2s';
+        
+        document.body.appendChild(cursor);
+        
+        document.addEventListener('mousemove', function(e) {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        
+        document.querySelectorAll('a, button, .feature-card').forEach(el => {
+            el.addEventListener('mouseenter', function() {
+                cursor.style.width = '40px';
+                cursor.style.height = '40px';
+                cursor.style.backgroundColor = 'rgba(50, 205, 50, 0.15)';
+            });
+            
+            el.addEventListener('mouseleave', function() {
+                cursor.style.width = '20px';
+                cursor.style.height = '20px';
+                cursor.style.backgroundColor = 'rgba(138, 43, 226, 0.3)';
+            });
+        });
+    </script>
+</body>
+</html>
