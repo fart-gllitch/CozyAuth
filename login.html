@@ -230,6 +230,22 @@
             color: #ff6b6b;
             display: block;
         }
+        
+        .loader {
+            display: none;
+            border: 3px solid rgba(138, 43, 226, 0.2);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary);
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -270,6 +286,7 @@
                     
                     <button type="submit" class="btn btn-primary">Sign In</button>
                     
+                    <div id="login-loader" class="loader"></div>
                     <div id="login-status" class="status-message"></div>
                     
                     <div class="form-footer">
@@ -305,6 +322,7 @@
                     
                     <button type="submit" class="btn btn-primary">Create Account</button>
                     
+                    <div id="register-loader" class="loader"></div>
                     <div id="register-status" class="status-message"></div>
                     
                     <div class="form-footer">
@@ -371,6 +389,7 @@
                 const username = document.getElementById('login-username').value;
                 const password = document.getElementById('login-password').value;
                 const statusMessage = document.getElementById('login-status');
+                const loader = document.getElementById('login-loader');
                 
                 if (!username || !password) {
                     statusMessage.textContent = 'Please fill in all fields';
@@ -378,38 +397,57 @@
                     return;
                 }
                 
-                // Check if user exists in localStorage
-                const storedUser = localStorage.getItem(username);
+                // Show loader
+                loader.style.display = 'block';
+                statusMessage.style.display = 'none';
                 
-                if (storedUser) {
-                    const user = JSON.parse(storedUser);
-                    
-                    if (user.password === password) {
-                        // Generate auth token (in a real app, this would be done on the server)
-                        const authToken = Array.from(Array(32), () => Math.floor(Math.random() * 36).toString(36)).join('');
-                        
-                        // Update user with auth token
-                        user.authToken = authToken;
-                        localStorage.setItem(username, JSON.stringify(user));
-                        
-                        // Set current user
-                        localStorage.setItem('currentUser', username);
-                        
-                        statusMessage.textContent = 'Login successful! Redirecting...';
-                        statusMessage.className = 'status-message success';
-                        
-                        // In a real app, you would redirect to a dashboard
-                        setTimeout(() => {
-                            window.location.href = 'index.html';
-                        }, 1500);
-                    } else {
-                        statusMessage.textContent = 'Incorrect password';
-                        statusMessage.className = 'status-message error';
+                // Prepare data to send to the API
+                const data = {
+                    Username: username,
+                    Password: password
+                };
+                
+                // Send POST request to login API
+                fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.error || 'Login failed');
+                        });
                     }
-                } else {
-                    statusMessage.textContent = 'User not found';
+                    return response.json();
+                })
+                .then(result => {
+                    // Hide loader
+                    loader.style.display = 'none';
+                    
+                    // Show success message
+                    statusMessage.textContent = 'Login successful! Redirecting...';
+                    statusMessage.className = 'status-message success';
+                    
+                    // Store credentials in localStorage
+                    localStorage.setItem('currentUser', result.username);
+                    localStorage.setItem('isLoggedIn', 'true');
+                    
+                    // Redirect to panel page
+                    setTimeout(() => {
+                        window.location.href = 'panel.html';
+                    }, 1500);
+                })
+                .catch(error => {
+                    // Hide loader
+                    loader.style.display = 'none';
+                    
+                    // Show error message
+                    statusMessage.textContent = error.message || 'An error occurred during login';
                     statusMessage.className = 'status-message error';
-                }
+                });
             });
             
             // Register form submission
@@ -420,6 +458,7 @@
                 const email = document.getElementById('register-email').value;
                 const password = document.getElementById('register-password').value;
                 const statusMessage = document.getElementById('register-status');
+                const loader = document.getElementById('register-loader');
                 
                 if (!username || !email || !password) {
                     statusMessage.textContent = 'Please fill in all fields';
@@ -427,37 +466,58 @@
                     return;
                 }
                 
-                // Check if username already exists
-                if (localStorage.getItem(username)) {
-                    statusMessage.textContent = 'Username already taken';
-                    statusMessage.className = 'status-message error';
-                    return;
-                }
+                // Show loader
+                loader.style.display = 'block';
+                statusMessage.style.display = 'none';
                 
-                // Generate auth token (in a real app, this would be done on the server)
-                const authToken = Array.from(Array(32), () => Math.floor(Math.random() * 36).toString(36)).join('');
-                
-                // Store user in localStorage
-                const user = {
-                    username,
-                    email,
-                    password,
-                    authToken,
-                    createdAt: new Date().toISOString()
+                // Prepare data to send to the API
+                const data = {
+                    Username: username,
+                    Password: password,
+                    Email: email
                 };
                 
-                localStorage.setItem(username, JSON.stringify(user));
-                
-                // Set current user
-                localStorage.setItem('currentUser', username);
-                
-                statusMessage.textContent = 'Account created successfully! Redirecting...';
-                statusMessage.className = 'status-message success';
-                
-                // In a real app, you would redirect to a dashboard
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
+                // Send POST request to register API
+                fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.error || 'Registration failed');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    // Hide loader
+                    loader.style.display = 'none';
+                    
+                    // Show success message
+                    statusMessage.textContent = 'Account created successfully! Redirecting...';
+                    statusMessage.className = 'status-message success';
+                    
+                    // Store credentials in localStorage
+                    localStorage.setItem('currentUser', username);
+                    localStorage.setItem('isLoggedIn', 'true');
+                    
+                    // Redirect to panel page
+                    setTimeout(() => {
+                        window.location.href = 'panel.html';
+                    }, 1500);
+                })
+                .catch(error => {
+                    // Hide loader
+                    loader.style.display = 'none';
+                    
+                    // Show error message
+                    statusMessage.textContent = error.message || 'An error occurred during registration';
+                    statusMessage.className = 'status-message error';
+                });
             });
             
             // Add floating particles
@@ -515,6 +575,12 @@
                 }
             `;
             document.head.appendChild(style);
+            
+            // Check if already logged in
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn === 'true') {
+                window.location.href = 'panel.html';
+            }
         });
     </script>
 </body>
