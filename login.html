@@ -434,6 +434,8 @@
                     // Store credentials in localStorage
                     localStorage.setItem('currentUser', result.username);
                     localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('password', password);
                     
                     // Redirect to panel page
                     setTimeout(() => {
@@ -506,6 +508,7 @@
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('username', username);
                     localStorage.setItem('password', password);
+                    localStorage.setItem('email', email);
                     
                     // Redirect to panel page
                     setTimeout(() => {
@@ -578,11 +581,25 @@
             `;
             document.head.appendChild(style);
             
-            // Check if already logged in
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            if (isLoggedIn === 'true') {
-                window.location.href = 'panel.html';
+            // Check if already logged in and all required localStorage items exist
+            function checkRequiredLocalStorage() {
+                const requiredItems = ['isLoggedIn', 'currentUser', 'username', 'password'];
+                
+                // Check if all required items exist
+                const missingItems = requiredItems.filter(item => !localStorage.getItem(item));
+                
+                if (localStorage.getItem('isLoggedIn') === 'true' && missingItems.length === 0) {
+                    // All required items are present, redirect to panel
+                    window.location.href = 'panel.html';
+                } else if (localStorage.getItem('isLoggedIn') === 'true' && missingItems.length > 0) {
+                    // User is marked as logged in but missing some credentials, clear all and require re-login
+                    localStorage.clear();
+                    console.log('Some required login data was missing. Please log in again.');
+                }
             }
+            
+            // Run check on page load
+            checkRequiredLocalStorage();
         });
     </script>
 </body>
