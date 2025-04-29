@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8A2BE2;
+            --secondary: #4B0082;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --light-dark: #1e1e1e;
+            --text: #f0f0f0;
+            --text-muted: #a0a0a0;
+            --accent: #32CD32;
+            --danger: #ff4757;
+            --border: #2a2a2a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--text);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--darker);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .logo span {
+            color: var(--primary);
+            margin-right: 8px;
+        }
+        
+        .nav-links {
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+        
+        .nav-group {
+            margin-bottom: 20px;
+        }
+        
+        .nav-group-title {
+            padding: 0 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        
+        .nav-item {
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            color: var(--text);
+            text-decoration: none;
+            transition: background-color 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-item.active {
+            background-color: rgba(138, 43, 226, 0.15);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        .nav-item.active i {
+            color: var(--primary);
+        }
+        
+        .nav-item span {
+            font-size: 0.9rem;
+        }
+        
+        .user-info {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .user-details {
+            flex-grow: 1;
+        }
+        
+        .username {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .user-status {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+        
+        .logout-btn:hover {
+            color: var(--danger);
+        }
+        
+        .main-content {
+            flex-grow: 1;
+            margin-left: 250px;
+            padding: 30px;
+            width: calc(100% - 250px);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn i {
+            margin-right: 8px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+        }
+        
+        .applications-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .application-card {
+            background-color: var(--light-dark);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: 1px solid var(--border);
+        }
+        
+        .application-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary);
+        }
+        
+        .app-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .app-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(138, 43, 226, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        
+        .app-icon i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .app-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .app-stats {
+            display: flex;
+            margin-top: 15px;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+        }
+        
+        .stat {
+            flex-grow: 1;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        
+        .empty-state {
+            background-color: var(--light-dark);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            border: 1px dashed var(--border);
+        }
+        
+        .empty-icon {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .empty-description {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--darker);
+            color: var(--text);
+            padding: 15px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            max-width: 300px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s, opacity 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .toast.success i {
+            color: var(--accent);
+        }
+        
+        .toast.error i {
+            color: var(--danger);
+        }
+        
+        .toast-message {
+            flex-grow: 1;
+        }
+        
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0 5px;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background-color: var(--light-dark);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s;
+        }
+        
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--darker);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn-cancel {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-cancel:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .btn-create {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(138, 43, 226, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="/panel.html" class="logo"><span>Cozy</span> Auth</a>
+        </div>
+        <nav class="nav-links">
+            <div class="nav-group">
+                <div class="nav-group-title">Main</div>
+                <a href="/panel.html" class="nav-item active">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Management</div>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Users</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-key"></i>
+                    <span>Licenses</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Security</span>
+                </a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Account</div>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Support</span>
+                </a>
+            </div>
+        </nav>
+        <div class="user-info">
+            <div class="user-avatar" id="user-avatar-initial">?</div>
+            <div class="user-details">
+                <div class="username" id="username-display">Loading...</div>
+                <div class="user-status">Active</div>
+            </div>
+            <button class="logout-btn" id="logout-btn" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">Applications</h1>
+            <button class="action-btn" id="create-app-btn">
+                <i class="fas fa-plus"></i> Create Application
+            </button>
+        </div>
+
+        <div id="applications-wrapper">
+            <div class="loading" id="loading-container">
+                <div class="spinner"></div>
+                <div>Loading your applications...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Application Modal -->
+    <div class="modal" id="create-app-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Create New Application</div>
+                <button class="modal-close" id="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="app-name" class="form-label">Application Name</label>
+                    <input type="text" id="app-name" class="form-input" placeholder="Enter application name">
+                </div>
+                <div class="form-group">
+                    <label for="app-description" class="form-label">Description (Optional)</label>
+                    <input type="text" id="app-description" class="form-input" placeholder="Enter application description">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="btn-cancel">Cancel</button>
+                <button class="btn-create" id="btn-create">Create Application</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <div class="toast-message" id="toast-message"></div>
+        <button class="toast-close" id="toast-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script>
+// Check authentication when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is logged in via localStorage
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
+    
+    if (!username || !password) {
+        // Not logged in, redirect to login page
+        window.location.href = '/login.html';
+        return;
+    }
+    
+    // Update UI with username
+    const usernameDisplay = document.getElementById('username-display');
+    usernameDisplay.textContent = username;
+    
+    // Set avatar initial
+    const userAvatar = document.getElementById('user-avatar-initial');
+    userAvatar.textContent = username.charAt(0).toUpperCase();
+    
+    // Verify credentials with API
+    verifyLogin(username, password);
+    
+    // Load user applications
+    loadApplications();
+});
+
+// Verify user login with API
+function verifyLogin(username, password) {
+    // Actual API call to verify user credentials
+    fetch('/api/verifylogin', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            // If verification failed, log out
+            localStorage.removeItem('username');
+            localStorage.removeItem('password');
+            window.location.href = '/login.html';
+            return;
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.success) {
+            console.log('Login verified successfully');
+        } else {
+            // If verification failed, log out
+            localStorage.removeItem('username');
+            localStorage.removeItem('password');
+            window.location.href = '/login.html';
+        }
+    })
+    .catch(error => {
+        console.error('Error verifying login:', error);
+        // On error, assume verification failed
+        localStorage.removeItem('username');
+        localStorage.removeItem('password');
+        window.location.href = '/login.html';
+    });
+}
+
+// Load user applications
+function loadApplications() {
+    const applicationsWrapper = document.getElementById('applications-wrapper');
+    const loadingContainer = document.getElementById('loading-container');
+    
+    // Actual API call to get applications
+    fetch('/api/getapplications', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Basic ${btoa(localStorage.getItem('username') + ':' + localStorage.getItem('password'))}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Remove loading spinner
+        loadingContainer.remove();
+        
+        const applications = data.applications || [];
+        
+        if (applications.length === 0) {
+            // Show empty state
+            applicationsWrapper.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h2 class="empty-title">No Applications Yet</h2>
+                    <p class="empty-description">Create your first application to get started with Cozy Auth.</p>
+                    <button class="action-btn" id="empty-create-btn">
+                        <i class="fas fa-plus"></i> Create Application
+                    </button>
+                </div>
+            `;
+            
+            // Add event listener to the empty state button
+            document.getElementById('empty-create-btn').addEventListener('click', openCreateModal);
+        } else {
+            // Create applications grid
+            const applicationsContainer = document.createElement('div');
+            applicationsContainer.className = 'applications-container';
+            
+            // Add application cards
+            applications.forEach(app => {
+                const appCard = createApplicationCard(app);
+                applicationsContainer.appendChild(appCard);
+            });
+            
+            applicationsWrapper.appendChild(applicationsContainer);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading applications:', error);
+        loadingContainer.remove();
+        applicationsWrapper.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <h2 class="empty-title">Error Loading Applications</h2>
+                <p class="empty-description">There was a problem loading your applications. Please try again.</p>
+                <button class="action-btn" id="retry-btn">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            </div>
+        `;
+        
+        document.getElementById('retry-btn').addEventListener('click', loadApplications);
+    });
+}
+
+// Create application card element
+function createApplicationCard(app) {
+    const card = document.createElement('div');
+    card.className = 'application-card';
+    card.setAttribute('data-app-id', app.id);
+    
+    card.innerHTML = `
+        <div class="app-header">
+            <div class="app-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="app-name">${app.name}</div>
+        </div>
+        <div class="app-description">${app.description || 'No description provided'}</div>
+        <div class="app-stats">
+            <div class="stat">
+                <div class="stat-value">${app.users || 0}</div>
+                <div class="stat-label">Users</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">${app.licenses || 0}</div>
+                <div class="stat-label">Licenses</div>
+            </div>
+        </div>
+    `;
+    
+    // Add click event to navigate to application panel
+    card.addEventListener('click', function() {
+        window.location.href = `/applicationpanel.html?id=${app.id}`;
+    });
+    
+    return card;
+}
+
+// Create Application Modal Functions
+const createAppBtn = document.getElementById('create-app-btn');
+const createAppModal = document.getElementById('create-app-modal');
+const modalClose = document.getElementById('modal-close');
+const btnCancel = document.getElementById('btn-cancel');
+const btnCreate = document.getElementById('btn-create');
+
+function openCreateModal() {
+    createAppModal.classList.add('show');
+    document.getElementById('app-name').focus();
+}
+
+function closeCreateModal() {
+    createAppModal.classList.remove('show');
+    document.getElementById('app-name').value = '';
+    document.getElementById('app-description').value = '';
+}
+
+createAppBtn.addEventListener('click', openCreateModal);
+modalClose.addEventListener('click', closeCreateModal);
+btnCancel.addEventListener('click', closeCreateModal);
+
+// Handle create application
+btnCreate.addEventListener('click', createApplication);
+
+function createApplication() {
+    const appName = document.getElementById('app-name').value.trim();
+    const appDescription = document.getElementById('app-description').value.trim();
+    
+    if (!appName) {
+        showToast('Please enter an application name', 'error');
+        return;
+    }
+    
+    // Close modal
+    closeCreateModal();
+    
+    // Show loading
+    const applicationsWrapper = document.getElementById('applications-wrapper');
+    applicationsWrapper.innerHTML = `
+        <div class="loading">
+            <div class="spinner"></div>
+            <div>Creating your application...</div>
+        </div>
+    `;
+    
+    // Actual API call to create application
+    fetch('/api/createapplication', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${btoa(localStorage.getItem('username') + ':' + localStorage.getItem('password'))}`
+        },
+        body: JSON.stringify({
+            name: appName,
+            description: appDescription
+        })
+    })
+    .then(response => {
+        if (response.status === 200) {
+            return response.json();
+        } else {
+            throw new Error('Failed to create application');
+        }
+    })
+    .then(data => {
+        if (data && data.success) {
+            // Load applications again to show the new one
+            loadApplications();
+            
+            // Show success toast
+            showToast('Application created successfully!', 'success');
+        } else {
+            throw new Error(data.message || 'Failed to create application');
+        }
+    })
+    .catch(error => {
+        console.error('Error creating application:', error);
+        
+        // Update UI with error
+        applicationsWrapper.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <h2 class="empty-title">Error Creating Application</h2>
+                <p class="empty-description">${error.message || 'There was a problem creating your application. Please try again.'}</p>
+                <button class="action-btn" id="retry-btn">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            </div>
+        `;
+        
+        document.getElementById('retry-btn').addEventListener('click', () => {
+            loadApplications();
+        });
+        
+        // Show error toast
+        showToast('Failed to create application', 'error');
+    });
+}
+
+// Toast notification functions
+const toast = document.getElementById('toast');
+const toastMessage = document.getElementById('toast-message');
+const toastClose = document.getElementById('toast-close');
+let toastTimeout;
+
+function showToast(message, type = 'success') {
+    // Clear any existing timeout
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+    }
+    
+    // Set message and icon
+    toastMessage.textContent = message;
+    
+    if (type === 'success') {
+        toast.className = 'toast show success';
+        toast.querySelector('i').className = 'fas fa-check-circle';
+    } else {
+        toast.className = 'toast show error';
+        toast.querySelector('i').className = 'fas fa-exclamation-circle';
+    }
+    
+    // Show toast
+    toast.classList.add('show');
+    
+    // Hide toast after 3 seconds
+    toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+toastClose.addEventListener('click', function() {
+    toast.classList.remove('show');
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+    }
+});
+
+// Logout function
+document.getElementById('logout-btn').addEventListener('click', function() {
+    // Clear credentials from localStorage
+    localStorage.removeItem('username');
+    localStorage.removeItem('password');
+    
+    // Redirect to login page
+    window.location.href = '/login.html';
+});
+    </script>
+</body>
+</html>

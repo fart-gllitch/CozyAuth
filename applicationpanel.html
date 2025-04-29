@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cozy - Application Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8A2BE2;
+            --secondary: #4B0082;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --light-dark: #1e1e1e;
+            --text: #f0f0f0;
+            --text-muted: #a0a0a0;
+            --accent: #32CD32;
+            --danger: #ff4757;
+            --border: #2a2a2a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--text);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--darker);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .logo span {
+            color: var(--primary);
+            margin-right: 8px;
+        }
+        
+        .nav-links {
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+        
+        .nav-group {
+            margin-bottom: 20px;
+        }
+        
+        .nav-group-title {
+            padding: 0 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        
+        .nav-item {
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            color: var(--text);
+            text-decoration: none;
+            transition: background-color 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-item.active {
+            background-color: rgba(138, 43, 226, 0.15);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        .nav-item.active i {
+            color: var(--primary);
+        }
+        
+        .nav-item span {
+            font-size: 0.9rem;
+        }
+        
+        .user-info {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .user-details {
+            flex-grow: 1;
+        }
+        
+        .username {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .user-status {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+        
+        .logout-btn:hover {
+            color: var(--danger);
+        }
+        
+        .main-content {
+            flex-grow: 1;
+            margin-left: 250px;
+            padding: 30px;
+            width: calc(100% - 250px);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn i {
+            margin-right: 8px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+        }
+        
+        .action-btn.secondary {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .action-btn.danger {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+        }
+        
+        .app-overview {
+            background-color: var(--light-dark);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+        
+        .app-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(138, 43, 226, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+        }
+        
+        .app-icon i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .app-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .app-description {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        
+        .app-meta {
+            display: flex;
+            gap: 30px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .meta-item i {
+            color: var(--primary);
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: var(--light-dark);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background-color: rgba(138, 43, 226, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stat-icon i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-change {
+            font-size: 0.9rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+        }
+        
+        .stat-change i {
+            margin-right: 5px;
+        }
+        
+        .stat-change.negative {
+            color: var(--danger);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .api-section {
+            background-color: var(--light-dark);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+        
+        .api-key-container {
+            display: flex;
+            align-items: center;
+            background-color: var(--darker);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .api-key {
+            font-family: 'Courier New', monospace;
+            flex-grow: 1;
+            font-size: 1rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 5px 10px;
+            font-size: 1rem;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .copy-btn i {
+            margin-right: 5px;
+        }
+        
+        .copy-btn:hover {
+            color: var(--text);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--darker);
+            color: var(--text);
+            padding: 15px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            max-width: 300px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s, opacity 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .toast.success i {
+            color: var(--accent);
+        }
+        
+        .toast.error i {
+            color: var(--danger);
+        }
+        
+        .toast-message {
+            flex-grow: 1;
+        }
+        
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0 5px;
+        }
+        
+        .error-container {
+            background-color: var(--light-dark);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        
+        .error-icon {
+            font-size: 3rem;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+        
+        .error-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .error-message {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="/panel.html" class="logo"><span>Cozy</span> Auth</a>
+        </div>
+        <nav class="nav-links">
+            <div class="nav-group">
+                <div class="nav-group-title">Main</div>
+                <a href="/panel.html" class="nav-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Management</div>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Users</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-key"></i>
+                    <span>Licenses</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Security</span>
+                </a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Account</div>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Support</span>
+                </a>
+            </div>
+        </nav>
+        <div class="user-info">
+            <div class="user-avatar" id="user-avatar-initial">?</div>
+            <div class="user-details">
+                <div class="username" id="username-display">Loading...</div>
+                <div class="user-status">Active</div>
+            </div>
+            <button class="logout-btn" id="logout-btn" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div id="app-content">
+            <div class="loading" id="loading-container">
+                <div class="spinner"></div>
+                <div>Loading application data...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <div class="toast-message" id="toast-message"></div>
+        <button class="toast-close" id="toast-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script>
+// Get application ID from URL
+function getApplicationId() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id');
+}
+
+// Check authentication when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if user is logged in via localStorage
+    const username = localStorage.getItem('cozy_username');
+    const password = localStorage.getItem('cozy_password');
+    
+    if (!username || !password) {
+        // Not logged in, redirect to login page
+        window.location.href = '/login.html';
+        return;
+    }
+    
+    // Update UI with username
+    const usernameDisplay = document.getElementById('username-display');
+    usernameDisplay.textContent = username;
+    
+    // Set avatar initial
+    const userAvatar = document.getElementById('user-avatar-initial');
+    userAvatar.textContent = username.charAt(0).toUpperCase();
+    
+    // Get application ID from URL
+    const appId = getApplicationId();
+    
+    if (!appId) {
+        showApplicationError('No application ID provided', 'Please select an application from the dashboard.');
+        return;
+    }
+    
+    // Load application data
+    loadApplicationData(appId);
+});
+
+// Load application data
+function loadApplicationData(appId) {
+    // Actual API call to get application details
+    fetch(`/api/checkapplication?id=${appId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Basic ${btoa(localStorage.getItem('cozy_username') + ':' + localStorage.getItem('cozy_password'))}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Application not found or you do not have access');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.success) {
+            // Render application details
+            renderApplicationPanel(data.application);
+        } else {
+            throw new Error(data.message || 'Failed to load application');
+        }
+    })
+    .catch(error => {
+        console.error('Error loading application:', error);
+        showApplicationError('Application Error', error.message);
+    });
+}
+
+// Render application panel
+function renderApplicationPanel(app) {
+    const appContent = document.getElementById('app-content');
+    
+    // Create application panel HTML
+    appContent.innerHTML = `
+        <div class="header">
+            <h1 class="page-title">${app.name}</h1>
+            <div class="action-btns">
+                <button class="action-btn secondary" id="edit-app-btn">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="action-btn danger" id="delete-app-btn">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+        
+        <div class="app-overview">
+            <div class="app-header">
+                <div class="app-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="app-info">
+                    <h2>${app.name}</h2>
+                    <div class="app-description">${app.description || 'No description provided'}</div>
+                </div>
+            </div>
+            <div class="app-meta">
+                <div class="meta-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Created on ${new Date(app.created_at).toLocaleDateString()}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-fingerprint"></i>
+                    <span>App ID: ${app.id}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-tag"></i>
+                    <span>Status: ${app.status || 'Active'}</span>
+                </div>
+            </div>
+        </div>
+        
+        <h2 class="section-title"><i class="fas fa-chart-bar"></i> Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Total Users</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="stat-value">${app.users || 0}</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i> ${app.user_growth || '0%'} this month
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Active Licenses</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                </div>
+                <div class="stat-value">${app.licenses || 0}</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i> ${app.license_growth || '0%'} this month
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Auth Requests</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                </div>
+                <div class="stat-value">${app.auth_requests || 0}</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i> ${app.request_growth || '0%'} this week
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Success Rate</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="stat-value">${app.success_rate || '0%'}</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-up"></i> ${app.rate_change || '0%'} from last week
+                </div>
+            </div>
+        </div>
+        
+        <h2 class="section-title"><i class="fas fa-key"></i> API Authentication</h2>
+        <div class="api-section">
+            <p>Use this secret key to authenticate API requests for this application.</p>
+            <div class="api-key-container">
+                <div class="api-key" id="api-key">${app.api_key || 'xxxx-xxxx-xxxx-xxxx'}</div>
+                <button class="copy-btn" id="copy-key-btn">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+            <button class="action-btn secondary" id="regenerate-key-btn">
+                <i class="fas fa-sync-alt"></i> Regenerate API Key
+            </button>
+        </div>
+    `;
+    
+    // Add event listeners
+    document.getElementById('copy-key-btn').addEventListener('click', function() {
+        const apiKey = document.getElementById('api-key').textContent;
+        navigator.clipboard.writeText(apiKey)
+            .then(() => {
+                showToast('API key copied to clipboard', 'success');
+            })
+            .catch(() => {
+                showToast('Failed to copy API key', 'error');
+            });
+    });
+    
+    document.getElementById('regenerate-key-btn').addEventListener('click', function() {
+        if (confirm('Are you sure you want to regenerate the API key? This will invalidate the existing key.')) {
+            showToast('API key regenerated', 'success');
+            // In a real app, this would make an API call to regenerate the key
+        }
+    });
+    
+    document.getElementById('edit-app-btn').addEventListener('click', function() {
+        showToast('Edit functionality is not implemented yet', 'error');
+    });
+    
+    document.getElementById('delete-app-btn').addEventListener('click', function() {
+        if (confirm(`Are you sure you want to delete ${app.name}? This action cannot be undone.`)) {
+            showToast('Delete functionality is not implemented yet', 'error');
+        }
+    });
+}
+
+// Show application error
+function showApplicationError(title, message) {
+    const appContent = document.getElementById('app-content');
+    
+    appContent.innerHTML = `
+        <div class="error-container">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h2 class="error-title">${title}</h2>
+            <p class="error-message">${message}</p>
+            <a href="/panel.html" class="action-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    `;
+}
+
+// Toast notification functions
+const toast = document.getElementById('toast');
+const toastMessage = document.getElementById('toast-message');
+const toastClose = document.getElementById('toast-close');
+let toastTimeout;
+
+function showToast(message, type = 'success') {
+    // Clear any existing timeout
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+    }
+    
+    // Set message and icon
+    toastMessage.textContent = message;
+    
+    if (type === 'success') {
+        toast.className = 'toast show success';
+        toast.querySelector('i').className = 'fas fa-check-circle';
+    } else {
+        toast.className = 'toast show error';
+        toast.querySelector('i').className = 'fas fa-exclamation-circle';
+    }
+    
+    // Show toast
+    toast.classList.add('show');
+    
+    // Hide toast after 3 seconds
+    toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+toastClose.addEventListener('click', function() {
+    toast.classList.remove('show');
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+    }
+});
+
+// Logout function
+document.getElementById('logout-btn').addEventListener('click', function() {
+    // Clear credentials from localStorage
+    localStorage.removeItem('cozy_username');
+    localStorage.removeItem('cozy_password');
+    
+    // Redirect to login page
+    window.location.href = '/login.html';
+});
+    </script>
+</body>
+</html>
