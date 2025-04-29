@@ -1,3 +1,8 @@
+try:
+    import werkzeug_patch
+except ImportError:
+    pass
+
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 import base64
