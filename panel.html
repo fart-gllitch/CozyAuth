@@ -681,16 +681,17 @@ function loadApplications() {
     const applicationsWrapper = document.getElementById('applications-wrapper');
     const loadingContainer = document.getElementById('loading-container');
     
+    // Get credentials from localStorage
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
+    
     // Actual API call to get applications
     fetch('/api/getapplications', {
         method: 'GET',
         headers: {
-            'Authorization': `Basic ${btoa(localStorage.getItem('username') + ':' + localStorage.getItem('password'))}`
-        },
-        body: JSON.stringify({
-                Username: username,  // Capitalized to match backend expectation
-                Password: password   // Capitalized to match backend expectation
-            })
+            'Authorization': `Basic ${btoa(username + ':' + password)}`,
+            'Content-Type': 'application/json'
+        }
     })
     .then(response => response.json())
     .then(data => {
