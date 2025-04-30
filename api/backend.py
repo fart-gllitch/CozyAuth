@@ -35,7 +35,7 @@ def register():
     data = request.get_json()
     
     # Check if required fields are provided
-    if not data or 'Username' not in data or 'Password' not in data:
+    if not data or 'username' not in data or 'password' not in data:
         return jsonify({"error": "Username and Password are required"}), 400
     
     username = data['Username']
@@ -69,8 +69,8 @@ def login():
     if not data or 'Username' not in data or 'Password' not in data:
         return jsonify({"error": "Username and Password are required"}), 400
     
-    username = data['username']
-    password = data['password']
+    username = data['Username']
+    password = data['Password']
     
     # Encode the provided password for comparison
     encoded_password = encode_password(password)
