@@ -660,9 +660,7 @@ function verifyLogin(username, password) {
             console.log('Login successfull');
         } else {
             // If verification failed, log out
-            localStorage.removeItem('username');
-            localStorage.removeItem('password');
-            window.location.href = '/login.html';
+            console.log('nope')
         }
     })
     .catch(error => {
