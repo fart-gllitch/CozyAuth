@@ -650,9 +650,7 @@ function verifyLogin(username, password) {
     .then(response => {
         if (!response.ok) {
             // If verification failed, log out
-            localStorage.removeItem('username');
-            localStorage.removeItem('password');
-            window.location.href = '/login.html';
+            console.log('nope')
             return;
         }
         return response.json();
