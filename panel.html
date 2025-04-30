@@ -648,8 +648,8 @@ async function verifyLogin(username, password) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                username: Username,
-                password: Password
+                Username: username,  // Changed from lowercase to match backend expectation
+                Password: password   // Changed from lowercase to match backend expectation
             })
         });
 
