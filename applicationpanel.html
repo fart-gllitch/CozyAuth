@@ -1106,7 +1106,7 @@ function fetchLicenses() {
     
     // Fix: Use the correct endpoint for retrieving keys
     fetch('/api/retrievekeys', {
-        method: 'GET', // This should match what the server expects
+        method: 'POST', // This should match what the server expects
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${appState.apiKey}`
