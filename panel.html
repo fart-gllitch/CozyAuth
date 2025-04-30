@@ -639,7 +639,9 @@ async function verifyLogin(username, password) {
     try {
         // Input validation
         if (!username || !password) {
-            throw new Error('Username and password are required');
+            console.error('Username and password are required');
+            showToast('Username and password are required', 'error');
+            return;
         }
 
         const response = await fetch('/api/login', {
@@ -648,8 +650,8 @@ async function verifyLogin(username, password) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                Username: username,  // Changed from lowercase to match backend expectation
-                Password: password   // Changed from lowercase to match backend expectation
+                Username: username,  // Capitalized to match backend expectation
+                Password: password   // Capitalized to match backend expectation
             })
         });
 
@@ -657,38 +659,20 @@ async function verifyLogin(username, password) {
         
         if (!response.ok) {
             // Handle specific error cases based on status code
-            console.error(`Login failed: ${data.message || 'Unknown error'}`);
-            
-            // Clear credentials on authentication failure
-            console.log('nope')
-            
-            // Provide meaningful error message
-            throw new Error(data.message || `Authentication failed (${response.status})`);
+            const errorMessage = data.error || data.message || `Authentication failed (${response.status})`;
+            console.error(`Login failed: ${errorMessage}`);
+            showToast(errorMessage, 'error');
+            return;
         }
         
-        if (data && data.success) {
-            console.log('Login successful');
-            
-            // Optionally store auth token instead of credentials
-            if (data.token) {
-                localStorage.setItem('authToken', data.token);
-            }
-            
-            return data;
-        } else {
-            console.error('Login response did not contain success status');
-            throw new Error('Invalid login response');
-        }
+        // If we get here, login was successful
+        console.log('Login verification successful:', data);
+        showToast('Login verification successful!', 'success');
+        return data;
     } catch (error) {
         console.error('Error during login verification:', error);
-        
-        // Clear any stored credentials
-        console.log('nope')
-        
-        // Redirect to login page
-        window.location.href = '/login.html';
-        
-        throw error; // Rethrow to allow calling code to handle it
+        showToast('Error verifying login: ' + error.message, 'error');
+        return;
     }
 }
 
