@@ -584,8 +584,8 @@ function getApplicationId() {
 // Check authentication when page loads
 document.addEventListener('DOMContentLoaded', function() {
     // Check if user is logged in via localStorage
-    const username = localStorage.getItem('cozy_username');
-    const password = localStorage.getItem('cozy_password');
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
     
     if (!username || !password) {
         // Not logged in, redirect to login page
