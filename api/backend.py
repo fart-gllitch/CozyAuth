@@ -87,32 +87,7 @@ def login():
     else:
         return jsonify({"error": "Invalid credentials"}), 401
 
-# New route: Verify login
-@app.route('/api/verifylogin', methods=['POST'])
-def verify_login():
-    data = request.get_json()
-    
-    # Check if required fields are provided
-    if not data or 'Username' not in data or 'Password' not in data:
-        return jsonify({"error": "Username and Password are required"}), 400
-    
-    username = data['Username']
-    password = data['Password']
-    
-    # Encode the provided password for comparison
-    encoded_password = encode_password(password)
-    
-    # Find user in database
-    user = users_collection.find_one({"Username": username})
-    
-    if not user:
-        return jsonify({"error": "Invalid credentials"}), 401
-    
-    # Compare passwords
-    if user['Password'] == encoded_password:
-        return jsonify({"message": "Credentials verified", "verified": True}), 200
-    else:
-        return jsonify({"error": "Invalid credentials", "verified": False}), 401
+
 
 # New route: Create application
 @app.route('/api/createapplication', methods=['POST'])
@@ -141,19 +116,24 @@ def create_application():
         "id": str(result.inserted_id)
     }), 201
 
-# New route: Get applications
-@app.route('/api/getapplication', methods=['POST'])
+@app.route('/api/getapplication', methods=['GET'])
 def get_application():
-    data = request.get_json()
+    # Get authorization header
+    auth_header = request.headers.get('Authorization')
     
-    # Check if required fields are provided
-    if not data or 'Username' not in data or 'Password' not in data:
-        return jsonify({"error": "Username and Password are required"}), 400
+    # Check if Authorization header is provided
+    if not auth_header or not auth_header.startswith('Basic '):
+        return jsonify({"error": "Authorization required"}), 401
     
-    username = data['Username']
-    password = data['Password']
+    # Extract and decode credentials from Basic auth
+    try:
+        encoded_credentials = auth_header.split(' ')[1]
+        decoded_credentials = base64.b64decode(encoded_credentials).decode('utf-8')
+        username, password = decoded_credentials.split(':')
+    except Exception:
+        return jsonify({"error": "Invalid authorization format"}), 401
     
-    # Verify user credentials first
+    # Verify user credentials
     encoded_password = encode_password(password)
     user = users_collection.find_one({"Username": username})
     
