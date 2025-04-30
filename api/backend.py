@@ -260,7 +260,7 @@ def retrieve_api_key():
     }), 200
 
 # Route to retrieve all keys and migrate users
-@app.route('/api/retrievekeys', methods=['GET'])
+@app.route('/api/retrievekeys', methods=['GET', 'POST'])
 def retrieve_keys():
     # Check if Keys collection exists, if not create it
     if "Keys" not in db.list_collection_names():
