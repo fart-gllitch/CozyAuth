@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cozy - Application Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
             --primary: #8A2BE2;
@@ -834,7 +835,7 @@
                             <i class="fas fa-download"></i>
                             Download Logs
                         </button>
-                        <button class="btn btn-primary">
+                        <button class="btn btn-primary" id="create-license-btn">
                             <i class="fas fa-plus"></i>
                             Create License
                         </button>
@@ -877,14 +878,14 @@
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">API Key</h2>
-                        <button class="btn btn-secondary">
+                        <button class="btn btn-secondary" id="reset-key-btn">
                             <i class="fas fa-sync-alt"></i>
                             Reset Key
                         </button>
                     </div>
 
                     <div class="api-key-container">
-                        <div class="api-key">c8s7dg4a9d83h44kf88s3d6f5g4h9s2d1f3g4h6j7k8l9a0p2o4i5u6y7t8r</div>
+                        <div class="api-key" id="api-key-display">c8s7dg4a9d83h44kf88s3d6f5g4h9s2d1f3g4h6j7k8l9a0p2o4i5u6y7t8r</div>
                         <button class="copy-btn" id="copy-api-key">
                             <i class="fas fa-copy"></i>
                             Copy
@@ -901,7 +902,7 @@
                     <div class="api-info">
                         <div class="api-info-item">
                             <div class="api-info-label">Application Name</div>
-                            <div class="api-info-value">My Application</div>
+                            <div class="api-info-value" id="app-name-info">My Application</div>
                         </div>
                         <div class="api-info-item">
                             <div class="api-info-label">Owner</div>
@@ -909,11 +910,11 @@
                         </div>
                         <div class="api-info-item">
                             <div class="api-info-label">Created</div>
-                            <div class="api-info-value">April 12, 2025</div>
+                            <div class="api-info-value" id="app-created-info">April 12, 2025</div>
                         </div>
                         <div class="api-info-item">
                             <div class="api-info-label">Last Updated</div>
-                            <div class="api-info-value">April 27, 2025</div>
+                            <div class="api-info-value" id="app-updated-info">April 27, 2025</div>
                         </div>
                     </div>
                 </div>
@@ -929,621 +930,696 @@
                     </div>
 
                     <div class="license-form">
-                        <input type="text" class="form-input" placeholder="Search licenses...">
-                        <select class="form-select">
-                            <option value="all">All Statuses</option>
-                            <option value="active">Active</option>
-                            <option value="used">Used</option>
-                            <option value="expired">Expired</option>
-                        </select>
-                        <button class="btn btn-secondary">
+                        <input type="text" class="form-input" id="license-search" placeholder="Search licenses...">
+                        <button class="btn btn-secondary" id="search-licenses-btn">
                             <i class="fas fa-search"></i>
                             Search
                         </button>
                     </div>
 
                     <div class="table-container">
-                        <table>
+                        <table id="license-table">
                             <thead>
                                 <tr>
-                                    <th>License Key</th>
-                                    <th>Status</th>
-                                    <th>Created</th>
-                                    <th>Expires</th>
-                                    <th>Last Used</th>
-                                    <th>Actions</th>
+                                    <th>LICENSE KEY</th>
+                                    <th>STATUS</th>
+                                    <th>CREATED</th>
+                                    <th>EXPIRES</th>
+                                    <th>LAST USED</th>
+                                    <th>ACTIONS</th>
                                 </tr>
                             </thead>
-                            <!DOCTYPE html>
-                            <html lang="en">
-                            <head>
-                                <meta charset="UTF-8">
-                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                <title>Cozy Auth - License Management Dashboard</title>
-                                <!-- Font Awesome -->
-                                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-                                <style>
-                                    /* CSS styles would go here */
-                                </style>
-                            </head>
-                            <body>
-                                <main class="main-content">
-                                    <div class="container">
-                                        <section class="dashboard-content">
-                                            <!-- API Key Section -->
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h2 class="card-title">API Key</h2>
-                                                    <button class="btn btn-secondary" id="reset-key-btn">
-                                                        <i class="fas fa-sync-alt"></i>
-                                                        Reset Key
-                                                    </button>
-                                                </div>
-                                                <div class="api-key-container">
-                                                    <div class="api-key" id="api-key-display">c8s7d6a5d843h4dk788s3d6f5g4n5z2d1f3g4h6j7k819a0p2w415u6y7t8r</div>
-                                                    <button class="btn btn-secondary" id="copy-api-key">
-                                                        <i class="fas fa-copy"></i>
-                                                        Copy
-                                                    </button>
-                                                </div>
-                                                <div class="api-key-warning">
-                                                    <i class="fas fa-exclamation-triangle"></i>
-                                                    <span>Important: Keep your API key secure. Anyone with this key can access your application.</span>
-                                                </div>
-                                                <div class="api-key-info">
-                                                    <div class="info-row">
-                                                        <div class="info-label">Application Name</div>
-                                                        <div class="info-value" id="app-name-info">My Application</div>
-                                                    </div>
-                                                    <div class="info-row">
-                                                        <div class="info-label">Owner</div>
-                                                        <div class="info-value" id="owner-username">cozycozy</div>
-                                                    </div>
-                                                    <div class="info-row">
-                                                        <div class="info-label">Created</div>
-                                                        <div class="info-value" id="app-created-info">April 12, 2025</div>
-                                                    </div>
-                                                    <div class="info-row">
-                                                        <div class="info-label">Last Updated</div>
-                                                        <div class="info-value" id="app-updated-info">April 27, 2025</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                            
-                                            <!-- License Keys Section -->
-                                            <div class="card" id="licenses">
-                                                <div class="card-header">
-                                                    <h2 class="card-title">License Keys</h2>
-                                                    <button class="btn btn-primary" id="create-license-btn">
-                                                        <i class="fas fa-plus"></i>
-                                                        Create License
-                                                    </button>
-                                                </div>
-                            
-                                                <div class="license-form">
-                                                    <input type="text" class="form-input" id="license-search" placeholder="Search licenses...">
-                                                    <button class="btn btn-secondary" id="search-licenses-btn">
-                                                        <i class="fas fa-search"></i>
-                                                        Search
-                                                    </button>
-                                                </div>
-                            
-                                                <div class="table-container">
-                                                    <table id="license-table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>LICENSE KEY</th>
-                                                                <th>STATUS</th>
-                                                                <th>CREATED</th>
-                                                                <th>EXPIRES</th>
-                                                                <th>LAST USED</th>
-                                                                <th>ACTIONS</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="license-table-body">
-                                                            <!-- License keys will be loaded dynamically via API -->
-                                                            <tr>
-                                                                <td colspan="6" class="loading-cell">
-                                                                    <div class="loading-spinner">Loading licenses...</div>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                            
-                                                <div class="table-footer">
-                                                    <div>Showing <span id="licenses-showing">0-0</span> of <span id="licenses-total">0</span> licenses</div>
-                                                    <div class="table-pagination" id="licenses-pagination">
-                                                        <button class="page-btn" data-page="prev"><i class="fas fa-chevron-left"></i></button>
-                                                        <button class="page-btn active" data-page="1">1</button>
-                                                        <button class="page-btn" data-page="next"><i class="fas fa-chevron-right"></i></button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                            
-                                            <!-- Other sections remain unchanged -->
-                            
-                                        </section>
-                                    </div>
-                                </main>
-                            
-                                <!-- Create License Modal -->
-                                <div class="modal-backdrop" id="create-license-modal">
-                                    <div class="modal">
-                                        <div class="modal-header">
-                                            <h3 class="modal-title">Create New License</h3>
-                                            <button class="modal-close" id="close-license-modal">&times;</button>
-                                        </div>
-                                        <form class="modal-form" id="create-license-form">
-                                            <div class="form-group">
-                                                <label class="form-label">License Type</label>
-                                                <select class="form-select" id="license-type">
-                                                    <option value="standard">Standard (1 year)</option>
-                                                    <option value="premium">Premium (2 years)</option>
-                                                    <option value="lifetime">Lifetime</option>
-                                                    <option value="custom">Custom</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="form-label">Quantity</label>
-                                                <input type="number" class="form-input" id="license-quantity" value="1" min="1" max="100">
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="form-label">Custom Expiry Date</label>
-                                                <input type="date" class="form-input" id="license-expiry" disabled>
-                                            </div>
-                                            <div class="form-actions">
-                                                <button type="button" class="btn btn-secondary" id="cancel-license-btn">Cancel</button>
-                                                <button type="submit" class="btn btn-primary">Create License</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            
-                                <!-- Other modals remain unchanged -->
-                            
-                                <!-- Theme Toggle Button -->
+                            <tbody id="license-table-body">
+                                <!-- License keys will be loaded dynamically via API -->
+                                <tr>
+                                    <td colspan="6" class="loading-cell">
+                                        <div class="loading-spinner">Loading licenses...</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-footer">
+                        <div>Showing <span id="licenses-showing">0-0</span> of <span id="licenses-total">0</span> licenses</div>
+                        <div class="table-pagination" id="licenses-pagination">
+                            <button class="page-btn" data-page="prev"><i class="fas fa-chevron-left"></i></button>
+                            <button class="page-btn active" data-page="1">1</button>
+                            <button class="page-btn" data-page="next"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
                                 <div class="theme-toggle">
                                     <i class="fas fa-moon"></i>
                                 </div>
                             
                                 <script>
                                     // Application state
-                                    const appState = {
-                                        currentPage: 1,
-                                        itemsPerPage: 5,
-                                        totalLicenses: 0,
-                                        appId: '',
-                                        username: '',
-                                        apiKey: ''
-                                    };
-                            
-                                    // Initialize app from localStorage and fetch necessary data
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        // Load application data from localStorage
-                                        let appData;
-                                        try {
-                                            appData = JSON.parse(localStorage.getItem('current_app') || '{}');
-                                            const appInfo = appData.details?.application || {};
-                                            
-                                            // Store app ID for API calls
-                                            appState.appId = appInfo.app_id || '';
-                                            
-                                            // Update application info in UI
-                                            document.getElementById('app-name-info').textContent = appInfo.name || 'My Application';
-                                            document.getElementById('app-created-info').textContent = new Date(appInfo.created_at || Date.now()).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
-                                            document.getElementById('app-updated-info').textContent = 'April 27, 2025'; // Sample data
-                                        } catch (error) {
-                                            console.error('Error parsing app data:', error);
-                                        }
-                                        
-                                        // Set username
-                                        appState.username = localStorage.getItem('username') || 'User';
-                                        document.getElementById('owner-username').textContent = appState.username;
-                                        
-                                        // Fetch API Key
-                                        fetchApiKey();
-                                        
-                                        // Fetch Licenses
-                                        fetchLicenses();
-                                        
-                                        // Setup event listeners
-                                        setupEventListeners();
-                                        
-                                        // Setup modals
-                                        setupModals();
-                                    });
-                                    
-                                    // Fetch API key from the server
-                                    function fetchApiKey() {
-                                        fetch('/api/retrieveapikey', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json'
-                                            },
-                                            body: JSON.stringify({
-                                                appId: appState.appId,
-                                                username: appState.username
-                                            })
-                                        })
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (data && data.apiKey) {
-                                                appState.apiKey = data.apiKey;
-                                                document.getElementById('api-key-display').textContent = data.apiKey;
-                                            } else {
-                                                console.error('Invalid API key response', data);
-                                                document.getElementById('api-key-display').textContent = 'Error loading API key';
-                                            }
-                                        })
-                                        .catch(error => {
-                                            console.error('Error fetching API key:', error);
-                                            document.getElementById('api-key-display').textContent = 'Failed to load API key';
-                                        });
-                                    }
-                                    
-                                    // Reset API key
-                                    function resetApiKey() {
-                                        fetch('/api/newapikey', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json'
-                                            },
-                                            body: JSON.stringify({
-                                                appId: appState.appId,
-                                                username: appState.username
-                                            })
-                                        })
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (data && data.apiKey) {
-                                                appState.apiKey = data.apiKey;
-                                                document.getElementById('api-key-display').textContent = data.apiKey;
-                                                showNotification('API key has been reset successfully', 'success');
-                                            } else {
-                                                showNotification('Failed to reset API key', 'error');
-                                            }
-                                        })
-                                        .catch(error => {
-                                            console.error('Error resetting API key:', error);
-                                            showNotification('Failed to reset API key', 'error');
-                                        });
-                                    }
-                                    
-                                    // Fetch licenses from the server
-                                    function fetchLicenses() {
-                                        const tableBody = document.getElementById('license-table-body');
-                                        tableBody.innerHTML = `
-                                            <tr>
-                                                <td colspan="6" class="loading-cell">
-                                                    <div class="loading-spinner">Loading licenses...</div>
-                                                </td>
-                                            </tr>
-                                        `;
-                                        
-                                        fetch('/api/retrievekeys', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'Authorization': `Bearer ${appState.apiKey}`
-                                            },
-                                            body: JSON.stringify({
-                                                appId: appState.appId,
-                                                username: appState.username,
-                                                page: appState.currentPage,
-                                                limit: appState.itemsPerPage
-                                            })
-                                        })
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (data && Array.isArray(data.licenses)) {
-                                                displayLicenses(data.licenses);
-                                                updatePagination(data.total || data.licenses.length);
-                                            } else {
-                                                console.error('Invalid licenses response', data);
-                                                tableBody.innerHTML = `
-                                                    <tr>
-                                                        <td colspan="6" class="error-cell">
-                                                            Error loading licenses. Please try again.
-                                                        </td>
-                                                    </tr>
-                                                `;
-                                            }
-                                        })
-                                        .catch(error => {
-                                            console.error('Error fetching licenses:', error);
-                                            tableBody.innerHTML = `
-                                                <tr>
-                                                    <td colspan="6" class="error-cell">
-                                                        Error loading licenses. Please try again.
-                                                    </td>
-                                                </tr>
-                                            `;
-                                            
-                                            // For demo purposes, display sample data
-                                            const sampleLicenses = [
-                                                { key: 'COZY-4F5G-H6J7-K8L9-M0N1', status: 'Active', created: 'Apr 15, 2025', expires: 'Apr 15, 2026', lastUsed: '2 hours ago' },
-                                                { key: 'COZY-5G6H-7J8K-9L0M-1N2P', status: 'Used', created: 'Apr 10, 2025', expires: 'Apr 10, 2026', lastUsed: 'Yesterday' },
-                                                { key: 'COZY-6H7J-8K9L-0M1N-2P3Q', status: 'Expired', created: 'Mar 15, 2024', expires: 'Mar 15, 2025', lastUsed: '45 days ago' },
-                                                { key: 'COZY-7J8K-9L0M-1N2P-3Q4R', status: 'Active', created: 'Apr 20, 2025', expires: 'Apr 20, 2026', lastUsed: '5 minutes ago' },
-                                                { key: 'COZY-8K9L-0M1N-2P3Q-4R5S', status: 'Active', created: 'Apr 22, 2025', expires: 'Apr 22, 2026', lastUsed: '1 day ago' }
-                                            ];
-                                            displayLicenses(sampleLicenses);
-                                            updatePagination(247); // Sample total
-                                        });
-                                    }
-                                    
-                                    // Display licenses in the table
-                                    function displayLicenses(licenses) {
-                                        const tableBody = document.getElementById('license-table-body');
-                                        tableBody.innerHTML = '';
-                                        
-                                        if (licenses.length === 0) {
-                                            tableBody.innerHTML = `
-                                                <tr>
-                                                    <td colspan="6" class="empty-cell">
-                                                        No licenses found
-                                                    </td>
-                                                </tr>
-                                            `;
-                                            return;
-                                        }
-                                        
-                                        licenses.forEach(license => {
-                                            const tr = document.createElement('tr');
-                                            
-                                            // Determine status class
-                                            const statusClass = `status-${license.status.toLowerCase()}`;
-                                            
-                                            tr.innerHTML = `
-                                                <td><span class="license-key">${license.key}</span></td>
-                                                <td><span class="status ${statusClass}">${license.status}</span></td>
-                                                <td>${license.created}</td>
-                                                <td>${license.expires}</td>
-                                                <td>${license.lastUsed}</td>
-                                                <td>
-                                                    <div class="table-actions">
-                                                        <button class="action-btn view-license" data-key="${license.key}"><i class="fas fa-eye"></i></button>
-                                                        <button class="action-btn edit-license" data-key="${license.key}"><i class="fas fa-edit"></i></button>
-                                                        <button class="action-btn delete delete-license" data-key="${license.key}"><i class="fas fa-trash-alt"></i></button>
-                                                    </div>
-                                                </td>
-                                            `;
-                                            tableBody.appendChild(tr);
-                                        });
-                                        
-                                        // Add event listeners to the new buttons
-                                        document.querySelectorAll('.view-license').forEach(btn => {
-                                            btn.addEventListener('click', function() {
-                                                const licenseKey = this.getAttribute('data-key');
-                                                viewLicenseDetails(licenseKey);
-                                            });
-                                        });
-                                        
-                                        document.querySelectorAll('.edit-license').forEach(btn => {
-                                            btn.addEventListener('click', function() {
-                                                const licenseKey = this.getAttribute('data-key');
-                                                editLicense(licenseKey);
-                                            });
-                                        });
-                                        
-                                        document.querySelectorAll('.delete-license').forEach(btn => {
-                                            btn.addEventListener('click', function() {
-                                                const licenseKey = this.getAttribute('data-key');
-                                                deleteLicense(licenseKey);
-                                            });
-                                        });
-                                    }
-                                    
-                                    // Update pagination information
-                                    function updatePagination(total) {
-                                        appState.totalLicenses = total;
-                                        
-                                        const start = (appState.currentPage - 1) * appState.itemsPerPage + 1;
-                                        const end = Math.min(start + appState.itemsPerPage - 1, total);
-                                        
-                                        document.getElementById('licenses-showing').textContent = `${start}-${end}`;
-                                        document.getElementById('licenses-total').textContent = total;
-                                        
-                                        // Update pagination buttons
-                                        const pagination = document.getElementById('licenses-pagination');
-                                        pagination.innerHTML = '';
-                                        
-                                        // Previous button
-                                        const prevBtn = document.createElement('button');
-                                        prevBtn.className = 'page-btn';
-                                        prevBtn.disabled = appState.currentPage === 1;
-                                        prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-                                        prevBtn.addEventListener('click', function() {
-                                            if (appState.currentPage > 1) {
-                                                appState.currentPage--;
-                                                fetchLicenses();
-                                            }
-                                        });
-                                        pagination.appendChild(prevBtn);
-                                        
-                                        // Page buttons
-                                        const totalPages = Math.ceil(total / appState.itemsPerPage);
-                                        const maxButtons = 5;
-                                        let startPage = Math.max(1, appState.currentPage - Math.floor(maxButtons / 2));
-                                        let endPage = Math.min(totalPages, startPage + maxButtons - 1);
-                                        
-                                        if (endPage - startPage + 1 < maxButtons) {
-                                            startPage = Math.max(1, endPage - maxButtons + 1);
-                                        }
-                                        
-                                        for (let i = startPage; i <= endPage; i++) {
-                                            const pageBtn = document.createElement('button');
-                                            pageBtn.className = `page-btn ${i === appState.currentPage ? 'active' : ''}`;
-                                            pageBtn.textContent = i;
-                                            pageBtn.addEventListener('click', function() {
-                                                appState.currentPage = i;
-                                                fetchLicenses();
-                                            });
-                                            pagination.appendChild(pageBtn);
-                                        }
-                                        
-                                        // Next button
-                                        const nextBtn = document.createElement('button');
-                                        nextBtn.className = 'page-btn';
-                                        nextBtn.disabled = appState.currentPage === totalPages;
-                                        nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-                                        nextBtn.addEventListener('click', function() {
-                                            if (appState.currentPage < totalPages) {
-                                                appState.currentPage++;
-                                                fetchLicenses();
-                                            }
-                                        });
-                                        pagination.appendChild(nextBtn);
-                                    }
-                                    
-                                    // Setup event listeners
-                                    function setupEventListeners() {
-                                        // Copy API Key
-                                        document.getElementById('copy-api-key').addEventListener('click', function() {
-                                            const apiKey = document.getElementById('api-key-display').textContent;
-                                            navigator.clipboard.writeText(apiKey)
-                                                .then(function() {
-                                                    const originalText = this.innerHTML;
-                                                    this.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                                                    setTimeout(() => {
-                                                        this.innerHTML = originalText;
-                                                    }, 2000);
-                                                }.bind(this))
-                                                .catch(function(err) {
-                                                    console.error('Could not copy text: ', err);
-                                                });
-                                        });
-                                        
-                                        // Reset API Key
-                                        document.getElementById('reset-key-btn').addEventListener('click', function() {
-                                            if (confirm('Are you sure you want to reset your API key? This will invalidate your current key.')) {
-                                                resetApiKey();
-                                            }
-                                        });
-                                        
-                                        // License search
-                                        document.getElementById('search-licenses-btn').addEventListener('click', function() {
-                                            const searchTerm = document.getElementById('license-search').value.trim();
-                                            // In a real app, you would update the search parameters and call fetchLicenses
-                                            alert(`Searching for: ${searchTerm}`);
-                                        });
-                                        
-                                        // License search on enter key
-                                        document.getElementById('license-search').addEventListener('keypress', function(e) {
-                                            if (e.key === 'Enter') {
-                                                document.getElementById('search-licenses-btn').click();
-                                            }
-                                        });
-                                        
-                                        // Create license form
-                                        document.getElementById('create-license-form').addEventListener('submit', function(e) {
-                                            e.preventDefault();
-                                            
-                                            const licenseType = document.getElementById('license-type').value;
-                                            const quantity = document.getElementById('license-quantity').value;
-                                            const expiryDate = document.getElementById('license-expiry').value;
-                                            
-                                            // In a real app, you would submit this to the server
-                                            alert(`Creating ${quantity} ${licenseType} license(s)${expiryDate ? ' with expiry: ' + expiryDate : ''}`);
-                                            
-                                            document.getElementById('create-license-modal').classList.remove('active');
-                                        });
-                                        
-                                        // Toggle custom expiry date field based on license type
-                                        document.getElementById('license-type').addEventListener('change', function() {
-                                            const expiryField = document.getElementById('license-expiry');
-                                            expiryField.disabled = this.value !== 'custom';
-                                        });
-                                    }
-                                    
-                                    // Action functions for license operations
-                                    function viewLicenseDetails(licenseKey) {
-                                        alert(`Viewing details for license: ${licenseKey}`);
-                                        // In a real app, you would fetch and display detailed information
-                                    }
-                                    
-                                    function editLicense(licenseKey) {
-                                        alert(`Editing license: ${licenseKey}`);
-                                        // In a real app, you would open an edit form with the license details
-                                    }
-                                    
-                                    function deleteLicense(licenseKey) {
-                                        if (confirm(`Are you sure you want to delete license: ${licenseKey}?`)) {
-                                            alert(`Deleting license: ${licenseKey}`);
-                                            // In a real app, you would send a delete request to the server
-                                            // and then refresh the license list
-                                        }
-                                    }
-                                    
-                                    // Set up modal interactions
-                                    function setupModals() {
-                                        const createLicenseBtn = document.getElementById('create-license-btn');
-                                        const closeLicenseModal = document.getElementById('close-license-modal');
-                                        const cancelLicenseBtn = document.getElementById('cancel-license-btn');
-                                        const licenseModal = document.getElementById('create-license-modal');
-                                        
-                                        if (createLicenseBtn) {
-                                            createLicenseBtn.addEventListener('click', function() {
-                                                licenseModal.classList.add('active');
-                                            });
-                                        }
-                                        
-                                        if (closeLicenseModal) {
-                                            closeLicenseModal.addEventListener('click', function() {
-                                                licenseModal.classList.remove('active');
-                                            });
-                                        }
-                                        
-                                        if (cancelLicenseBtn) {
-                                            cancelLicenseBtn.addEventListener('click', function() {
-                                                licenseModal.classList.remove('active');
-                                            });
-                                        }
-                                        
-                                        // Close modals when clicking outside
-                                        window.addEventListener('click', function(event) {
-                                            if (event.target === licenseModal) {
-                                                licenseModal.classList.remove('active');
-                                            }
-                                        });
-                                    }
-                                    
-                                    // Display a notification
-                                    function showNotification(message, type = 'info') {
-                                        const notification = document.createElement('div');
-                                        notification.className = `notification notification-${type}`;
-                                        notification.innerHTML = `
-                                            <div class="notification-content">
-                                                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-                                                <span>${message}</span>
-                                            </div>
-                                            <button class="notification-close">&times;</button>
-                                        `;
-                                        
-                                        document.body.appendChild(notification);
-                                        
-                                        // Add active class after a small delay to trigger animation
-                                        setTimeout(() => {
-                                            notification.classList.add('active');
-                                        }, 10);
-                                        
-                                        // Remove notification after 5 seconds
-                                        setTimeout(() => {
-                                            notification.classList.remove('active');
-                                            setTimeout(() => {
-                                                notification.remove();
-                                            }, 300); // Wait for fade out animation
-                                        }, 5000);
-                                        
-                                        // Close button functionality
-                                        notification.querySelector('.notification-close').addEventListener('click', function() {
-                                            notification.classList.remove('active');
-                                            setTimeout(() => {
-                                                notification.remove();
-                                            }, 300);
-                                        });
-                                    }
+// Application state
+const appState = {
+    currentPage: 1,
+    itemsPerPage: 5,
+    totalLicenses: 0,
+    appId: '',
+    username: '',
+    apiKey: ''
+};
+
+// Initialize app from localStorage and fetch necessary data
+document.addEventListener('DOMContentLoaded', function() {
+    // Load application data from localStorage
+    let appData;
+    try {
+        appData = JSON.parse(localStorage.getItem('current_app') || '{}');
+        const appInfo = appData.details?.application || {};
+        
+        // Store app ID for API calls
+        appState.appId = appInfo.app_id || '';
+        
+        // Update application info in UI
+        document.getElementById('app-name-info').textContent = appInfo.name || 'My Application';
+        document.getElementById('app-created-info').textContent = new Date(appInfo.created_at || Date.now()).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
+        document.getElementById('app-updated-info').textContent = appInfo.updated_at ? new Date(appInfo.updated_at).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'April 27, 2025';
+    } catch (error) {
+        console.error('Error parsing app data:', error);
+    }
+    
+    // Set username
+    appState.username = localStorage.getItem('username') || 'User';
+    document.getElementById('owner-username').textContent = appState.username;
+    
+    // Fetch API Key
+    fetchApiKey();
+    
+    // Fetch Licenses
+    fetchLicenses();
+    
+    // Setup event listeners
+    setupEventListeners();
+    
+    // Setup modals
+    setupModals();
+    
+    // Setup theme toggle
+    setupThemeToggle();
+});
+
+// Fetch API key from the server
+function fetchApiKey() {
+    fetch('/api/retrieveapikey', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            appId: appState.appId,
+            username: appState.username
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data && data.apiKey) {
+            appState.apiKey = data.apiKey;
+            document.getElementById('api-key-display').textContent = data.apiKey;
+        } else {
+            console.error('Invalid API key response', data);
+            document.getElementById('api-key-display').textContent = 'Error loading API key';
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching API key:', error);
+        document.getElementById('api-key-display').textContent = 'Failed to load API key';
+    });
+}
+
+// Reset API key
+function resetApiKey() {
+    fetch('/api/newapikey', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            appId: appState.appId,
+            username: appState.username
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data && data.apiKey) {
+            appState.apiKey = data.apiKey;
+            document.getElementById('api-key-display').textContent = data.apiKey;
+            showNotification('API key has been reset successfully', 'success');
+        } else {
+            showNotification('Failed to reset API key', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error resetting API key:', error);
+        showNotification('Failed to reset API key', 'error');
+    });
+}
+
+// Fetch licenses from the server
+function fetchLicenses() {
+    const tableBody = document.getElementById('license-table-body');
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="6" class="loading-cell">
+                <div class="loading-spinner">Loading licenses...</div>
+            </td>
+        </tr>
+    `;
+    
+    fetch('/api/retrievekeys', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${appState.apiKey}`
+        },
+        body: JSON.stringify({
+            appId: appState.appId,
+            username: appState.username,
+            page: appState.currentPage,
+            limit: appState.itemsPerPage
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && Array.isArray(data.licenses)) {
+            displayLicenses(data.licenses);
+            updatePagination(data.total || data.licenses.length);
+        } else {
+            console.error('Invalid licenses response', data);
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="error-cell">
+                        Error loading licenses. Please try again.
+                    </td>
+                </tr>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching licenses:', error);
+        // No keys found message with create button
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty-cell">
+                    <div class="no-keys-message">
+                        No keys found! Maybe create one?
+                        <button class="btn btn-primary generate-key-btn" id="generate-first-key">
+                            <i class="fas fa-key"></i> Generate Key
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+        
+        // Add event listener to the generate button
+        document.getElementById('generate-first-key')?.addEventListener('click', generateLicenseKey);
+        
+        // Update pagination to show 0 items
+        updatePagination(0);
+    });
+}
+
+// Generate a new license key
+function generateLicenseKey() {
+    fetch('/api/generatekey', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'username': appState.username,
+            'password': localStorage.getItem('password') || ''
+        },
+        body: JSON.stringify({
+            appId: appState.appId,
+            licenseType: 'standard'
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.key) {
+            showNotification('License key created successfully!', 'success');
+            // Refresh the license list
+            fetchLicenses();
+        } else {
+            showNotification('Failed to create license key', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error generating license key:', error);
+        showNotification('Failed to create license key', 'error');
+    });
+}
+
+// Display licenses in the table
+function displayLicenses(licenses) {
+    const tableBody = document.getElementById('license-table-body');
+    tableBody.innerHTML = '';
+    
+    if (licenses.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty-cell">
+                    <div class="no-keys-message">
+                        No keys found! Maybe create one?
+                        <button class="btn btn-primary generate-key-btn" id="generate-first-key">
+                            <i class="fas fa-key"></i> Generate Key
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+        
+        // Add event listener to the generate button
+        document.getElementById('generate-first-key')?.addEventListener('click', generateLicenseKey);
+        return;
+    }
+    
+    licenses.forEach(license => {
+        const tr = document.createElement('tr');
+        
+        // Determine status class
+        const statusClass = `status-${license.status.toLowerCase()}`;
+        
+        tr.innerHTML = `
+            <td><span class="license-key">${license.key}</span></td>
+            <td><span class="status ${statusClass}">${license.status}</span></td>
+            <td>${license.created}</td>
+            <td>${license.expires}</td>
+            <td>${license.lastUsed}</td>
+            <td>
+                <div class="table-actions">
+                    <button class="action-btn view-license" data-key="${license.key}"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn edit-license" data-key="${license.key}"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete delete-license" data-key="${license.key}"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(tr);
+    });
+    
+    // Add event listeners to the new buttons
+    document.querySelectorAll('.view-license').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const licenseKey = this.getAttribute('data-key');
+            viewLicenseDetails(licenseKey);
+        });
+    });
+    
+    document.querySelectorAll('.edit-license').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const licenseKey = this.getAttribute('data-key');
+            editLicense(licenseKey);
+        });
+    });
+    
+    document.querySelectorAll('.delete-license').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const licenseKey = this.getAttribute('data-key');
+            deleteLicense(licenseKey);
+        });
+    });
+}
+
+// Update pagination information
+function updatePagination(total) {
+    appState.totalLicenses = total;
+    
+    const start = total > 0 ? (appState.currentPage - 1) * appState.itemsPerPage + 1 : 0;
+    const end = Math.min(start + appState.itemsPerPage - 1, total);
+    
+    document.getElementById('licenses-showing').textContent = `${start}-${end}`;
+    document.getElementById('licenses-total').textContent = total;
+    
+    // Update pagination buttons
+    const pagination = document.getElementById('licenses-pagination');
+    pagination.innerHTML = '';
+    
+    // If no licenses, hide pagination
+    if (total === 0) {
+        pagination.style.display = 'none';
+        return;
+    } else {
+        pagination.style.display = 'flex';
+    }
+    
+    // Previous button
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'page-btn';
+    prevBtn.disabled = appState.currentPage === 1;
+    prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    prevBtn.addEventListener('click', function() {
+        if (appState.currentPage > 1) {
+            appState.currentPage--;
+            fetchLicenses();
+        }
+    });
+    pagination.appendChild(prevBtn);
+    
+    // Page buttons
+    const totalPages = Math.ceil(total / appState.itemsPerPage);
+    const maxButtons = 5;
+    let startPage = Math.max(1, appState.currentPage - Math.floor(maxButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+    
+    if (endPage - startPage + 1 < maxButtons) {
+        startPage = Math.max(1, endPage - maxButtons + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.className = `page-btn ${i === appState.currentPage ? 'active' : ''}`;
+        pageBtn.textContent = i;
+        pageBtn.addEventListener('click', function() {
+            appState.currentPage = i;
+            fetchLicenses();
+        });
+        pagination.appendChild(pageBtn);
+    }
+    
+    // Next button
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'page-btn';
+    nextBtn.disabled = appState.currentPage === totalPages;
+    nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    nextBtn.addEventListener('click', function() {
+        if (appState.currentPage < totalPages) {
+            appState.currentPage++;
+            fetchLicenses();
+        }
+    });
+    pagination.appendChild(nextBtn);
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    // Copy API Key
+    document.getElementById('copy-api-key').addEventListener('click', function() {
+        const apiKey = document.getElementById('api-key-display').textContent;
+        navigator.clipboard.writeText(apiKey)
+            .then(function() {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            }.bind(this))
+            .catch(function(err) {
+                console.error('Could not copy text: ', err);
+            });
+    });
+    
+    // Reset API Key
+    document.getElementById('reset-key-btn').addEventListener('click', function() {
+        if (confirm('Are you sure you want to reset your API key? This will invalidate your current key.')) {
+            resetApiKey();
+        }
+    });
+    
+    // License search
+    document.getElementById('search-licenses-btn').addEventListener('click', function() {
+        const searchTerm = document.getElementById('license-search').value.trim();
+        if (searchTerm) {
+            // Reset to first page when searching
+            appState.currentPage = 1;
+            // In a real app, you would update the search parameters and call fetchLicenses
+            fetchLicenses();
+        }
+    });
+    
+    // License search on enter key
+    document.getElementById('license-search').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('search-licenses-btn').click();
+        }
+    });
+    
+    // Create license form
+    document.getElementById('create-license-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const licenseType = document.getElementById('license-type').value;
+        const quantity = parseInt(document.getElementById('license-quantity').value);
+        const expiryDate = document.getElementById('license-expiry').value;
+        
+        if (quantity < 1 || quantity > 100) {
+            showNotification('Quantity must be between 1 and 100', 'error');
+            return;
+        }
+        
+        // Create license keys
+        fetch('/api/generatekey', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'username': appState.username,
+                'password': localStorage.getItem('password') || ''
+            },
+            body: JSON.stringify({
+                appId: appState.appId,
+                licenseType: licenseType,
+                quantity: quantity,
+                expiryDate: licenseType === 'custom' ? expiryDate : null
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && (data.key || data.keys)) {
+                showNotification(`Successfully created ${quantity} license key(s)`, 'success');
+                // Refresh the license list
+                fetchLicenses();
+                document.getElementById('create-license-modal').classList.remove('active');
+            } else {
+                showNotification('Failed to create license keys', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error creating license keys:', error);
+            showNotification('Failed to create license keys', 'error');
+        });
+    });
+    
+    // Toggle custom expiry date field based on license type
+    document.getElementById('license-type').addEventListener('change', function() {
+        const expiryField = document.getElementById('license-expiry');
+        expiryField.disabled = this.value !== 'custom';
+        
+        if (this.value === 'custom' && !expiryField.value) {
+            // Set default expiry date to 1 year from now
+            const oneYearFromNow = new Date();
+            oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+            expiryField.value = oneYearFromNow.toISOString().split('T')[0];
+        }
+    });
+}
+
+// Action functions for license operations
+function viewLicenseDetails(licenseKey) {
+    fetch(`/api/licensedetails`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${appState.apiKey}`
+        },
+        body: JSON.stringify({
+            appId: appState.appId,
+            licenseKey: licenseKey
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.license) {
+            // Show license details in a modal
+            showLicenseDetailsModal(data.license);
+        } else {
+            showNotification('Failed to load license details', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching license details:', error);
+        showNotification('Failed to load license details', 'error');
+    });
+}
+
+function showLicenseDetailsModal(license) {
+    // Implementation would depend on your modal structure
+    alert(`License Details:\nKey: ${license.key}\nStatus: ${license.status}\nCreated: ${license.created}\nExpires: ${license.expires}\nLast Used: ${license.lastUsed}`);
+}
+
+function editLicense(licenseKey) {
+    // For now, just show an alert
+    alert(`Editing license: ${licenseKey}`);
+    // In a real app, you would fetch license details and open an edit form
+}
+
+function deleteLicense(licenseKey) {
+    if (confirm(`Are you sure you want to delete license: ${licenseKey}?`)) {
+        fetch('/api/deletelicense', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${appState.apiKey}`
+            },
+            body: JSON.stringify({
+                appId: appState.appId,
+                licenseKey: licenseKey
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.success) {
+                showNotification('License deleted successfully', 'success');
+                fetchLicenses();
+            } else {
+                showNotification('Failed to delete license', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting license:', error);
+            showNotification('Failed to delete license', 'error');
+        });
+    }
+}
+
+// Set up modal interactions
+function setupModals() {
+    const createLicenseBtn = document.getElementById('create-license-btn');
+    const closeLicenseModal = document.getElementById('close-license-modal');
+    const cancelLicenseBtn = document.getElementById('cancel-license-btn');
+    const licenseModal = document.getElementById('create-license-modal');
+    
+    if (createLicenseBtn && licenseModal) {
+        createLicenseBtn.addEventListener('click', function() {
+            licenseModal.classList.add('active');
+            
+            // Reset form
+            document.getElementById('license-type').value = 'standard';
+            document.getElementById('license-quantity').value = 1;
+            document.getElementById('license-expiry').disabled = true;
+            document.getElementById('license-expiry').value = '';
+        });
+    }
+    
+    if (closeLicenseModal && licenseModal) {
+        closeLicenseModal.addEventListener('click', function() {
+            licenseModal.classList.remove('active');
+        });
+    }
+    
+    if (cancelLicenseBtn && licenseModal) {
+        cancelLicenseBtn.addEventListener('click', function() {
+            licenseModal.classList.remove('active');
+        });
+    }
+    
+    // Close modals when clicking outside
+    if (licenseModal) {
+        window.addEventListener('click', function(event) {
+            if (event.target === licenseModal) {
+                licenseModal.classList.remove('active');
+            }
+        });
+    }
+}
+
+// Setup theme toggle
+function setupThemeToggle() {
+    const themeToggle = document.querySelector('.theme-toggle');
+    if (themeToggle) {
+        // Check if dark mode is enabled
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        
+        // Set initial theme
+        if (isDarkMode) {
+            document.body.classList.add('dark-theme');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+            document.body.classList.remove('dark-theme');
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        }
+        
+        // Toggle theme on button click
+        themeToggle.addEventListener('click', function() {
+            const isDark = document.body.classList.toggle('dark-theme');
+            localStorage.setItem('darkMode', isDark);
+            
+            // Update icon
+            if (isDark) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
+    }
+}
+
+// Display a notification
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="notification-close">&times;</button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Add active class after a small delay to trigger animation
+    setTimeout(() => {
+        notification.classList.add('active');
+    }, 10);
+    
+    // Remove notification after 5 seconds
+    setTimeout(() => {
+        notification.classList.remove('active');
+        setTimeout(() => {
+            notification.remove();
+        }, 300); // Wait for fade out animation
+    }, 5000);
+    
+    // Close button functionality
+    notification.querySelector('.notification-close').addEventListener('click', function() {
+        notification.classList.remove('active');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    });
+}
                                 </script>
                             </body>
                             </html>
