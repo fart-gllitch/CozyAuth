@@ -498,6 +498,206 @@
             color: var(--text-muted);
             margin-bottom: 20px;
         }
+        
+        .license-section {
+            background-color: var(--light-dark);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+        
+        .license-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .license-list {
+            background-color: var(--darker);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+        
+        .license-item {
+            display: flex;
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+        }
+        
+        .license-item:last-child {
+            border-bottom: none;
+        }
+        
+        .license-key {
+            font-family: 'Courier New', monospace;
+            flex-grow: 1;
+            font-size: 0.9rem;
+        }
+        
+        .license-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin: 0 15px;
+        }
+        
+        .license-status.active {
+            background-color: rgba(50, 205, 50, 0.2);
+            color: var(--accent);
+        }
+        
+        .license-status.used {
+            background-color: rgba(255, 71, 87, 0.2);
+            color: var(--danger);
+        }
+        
+        .license-date {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-right: 10px;
+            min-width: 100px;
+        }
+        
+        .license-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .license-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 5px;
+            transition: color 0.3s;
+        }
+        
+        .license-btn:hover {
+            color: var(--primary);
+        }
+        
+        .license-btn.delete:hover {
+            color: var(--danger);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: var(--light-dark);
+            border-radius: 10px;
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--border);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px 15px;
+            background-color: var(--darker);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 10px 15px;
+            background-color: var(--darker);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 6px;
+            font-size: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0a0' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 35px;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .empty-state {
+            padding: 30px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body>
@@ -508,7 +708,7 @@
         <nav class="nav-links">
             <div class="nav-group">
                 <div class="nav-group-title">Main</div>
-                <a href="/panel.html" class="nav-item">
+                <a href="/panel.html" class="nav-item active">
                     <i class="fas fa-th-large"></i>
                     <span>Dashboard</span>
                 </a>
@@ -565,6 +765,45 @@
         </div>
     </div>
 
+    <!-- Generate License Modal -->
+    <div class="modal" id="generate-license-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Generate New License</h3>
+                <button class="modal-close" id="close-license-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">License Level</label>
+                <select class="form-select" id="license-level">
+                    <option value="basic">Basic</option>
+                    <option value="premium">Premium</option>
+                    <option value="enterprise">Enterprise</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Duration (days)</label>
+                <select class="form-select" id="license-duration">
+                    <option value="1">1 day</option>
+                    <option value="7">7 days</option>
+                    <option value="30" selected>30 days</option>
+                    <option value="90">90 days</option>
+                    <option value="365">365 days</option>
+                    <option value="unlimited">Lifetime</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Quantity</label>
+                <input type="number" class="form-input" id="license-quantity" value="1" min="1" max="100">
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn secondary" id="cancel-license-btn">Cancel</button>
+                <button class="action-btn" id="confirm-generate-license">Generate</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div class="toast" id="toast">
         <i class="fas fa-check-circle"></i>
@@ -611,34 +850,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load application data
     loadApplicationData(appId);
+    
+    // Load license keys
+    loadLicenseKeys(appId);
 });
 
 // Load application data
 function loadApplicationData(appId) {
-    // Check if the appId is specified, otherwise try to get it from current context
-    if (!appId) {
-        // Try to get the appId from URL parameters or other current context
-        const urlParams = new URLSearchParams(window.location.search);
-        appId = urlParams.get('id');
-        
-        // If still no appId, check if we're viewing the first app from owned apps
-        if (!appId) {
-            const ownedAppIds = JSON.parse(localStorage.getItem('owned_appids') || '[]');
-            appId = ownedAppIds.length > 0 ? ownedAppIds[0] : null;
-        }
-        
-        // If we still don't have an appId, show an error
-        if (!appId) {
-            showApplicationError('Application Error', 'No application ID specified');
-            return;
-        }
-    }
-    
     // Get credentials from localStorage
     const username = localStorage.getItem('username');
     const password = localStorage.getItem('password');
     
-    // Actual API call to get application details
+    // API call to get application details
     fetch(`/api/getapplications?id=${appId}`, {
         method: 'GET',
         headers: {
@@ -648,7 +871,7 @@ function loadApplicationData(appId) {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Application not found or you do not have access');
+            throw new Error('Failed to load application data');
         }
         return response.json();
     })
@@ -656,14 +879,6 @@ function loadApplicationData(appId) {
         if (data && data.success) {
             // Render application details
             renderApplicationPanel(data.application);
-            
-            // Verify this app_id is in our owned apps list
-            const ownedAppIds = JSON.parse(localStorage.getItem('owned_appids') || '[]');
-            if (!ownedAppIds.includes(data.application.app_id)) {
-                // Add this app_id to our owned apps if it's not already there
-                ownedAppIds.push(data.application.app_id);
-                localStorage.setItem('owned_appids', JSON.stringify(ownedAppIds));
-            }
         } else {
             throw new Error(data.message || 'Failed to load application');
         }
@@ -674,20 +889,173 @@ function loadApplicationData(appId) {
     });
 }
 
+// Load license keys
+function loadLicenseKeys(appId) {
+    // Get credentials from localStorage
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
+    
+    // API call to get license keys
+    fetch(`/api/getlicensekeys?app_id=${appId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Basic ${btoa(username + ':' + password)}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to load license keys');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.success) {
+            // Render license keys
+            renderLicenseKeys(data.licenses);
+        } else {
+            throw new Error(data.message || 'Failed to load license keys');
+        }
+    })
+    .catch(error => {
+        console.error('Error loading license keys:', error);
+        // Don't show full error to user, just handle gracefully
+        renderLicenseKeys([]);
+    });
+}
+
+// Generate API key
+function generateApiKey(appId) {
+    // Get credentials from localStorage
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
+    
+    // API call to generate API key
+    fetch(`/api/generateapikey?app_id=${appId}`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Basic ${btoa(username + ':' + password)}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to generate API key');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.success) {
+            // Update API key in UI
+            document.getElementById('api-key').textContent = data.api_key;
+            showToast('API key regenerated successfully', 'success');
+        } else {
+            throw new Error(data.message || 'Failed to generate API key');
+        }
+    })
+    .catch(error => {
+        console.error('Error generating API key:', error);
+        showToast('Failed to generate API key', 'error');
+    });
+}
+
+// Generate license key
+function generateLicenseKey(appId, level, duration, quantity) {
+    // Get credentials from localStorage
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
+    
+    // API call to generate license key
+    fetch(`/api/generatelicensekey`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Basic ${btoa(username + ':' + password)}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            app_id: appId,
+            level: level,
+            duration: duration,
+            quantity: quantity
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to generate license key');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.success) {
+            // Close modal
+            closeModal('generate-license-modal');
+            // Reload license keys to show new ones
+            loadLicenseKeys(appId);
+            showToast(`${quantity} license key(s) generated successfully`, 'success');
+        } else {
+            throw new Error(data.message || 'Failed to generate license keys');
+        }
+    })
+    .catch(error => {
+        console.error('Error generating license keys:', error);
+        showToast('Failed to generate license keys', 'error');
+    });
+}
+
+// Delete license key
+function deleteLicenseKey(licenseId) {
+    // Get credentials from localStorage
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
+    
+    // API call to delete license key
+    fetch(`/api/deletelicensekey`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Basic ${btoa(username + ':' + password)}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            license_id: licenseId
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to delete license key');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.success) {
+            // Reload license keys
+            const appId = getApplicationId();
+            loadLicenseKeys(appId);
+            showToast('License key deleted successfully', 'success');
+        } else {
+            throw new Error(data.message || 'Failed to delete license key');
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting license key:', error);
+        showToast('Failed to delete license key', 'error');
+    });
+}
+
 // Render application panel
 function renderApplicationPanel(app) {
-    const appContent = document.getElementById('app-content');
+    const loadingContainer = document.getElementById('loading-container');
+    loadingContainer.style.display = 'none';
     
-    // Create application panel HTML
+    const appContent = document.getElementById('app-content');
     appContent.innerHTML = `
         <div class="header">
-            <h1 class="page-title">${app.name}</h1>
+            <h1 class="page-title">Application Panel</h1>
             <div class="action-btns">
-                <button class="action-btn secondary" id="edit-app-btn">
-                    <i class="fas fa-edit"></i> Edit
+                <button class="action-btn" id="generate-license-btn">
+                    <i class="fas fa-plus"></i> Generate License
                 </button>
-                <button class="action-btn danger" id="delete-app-btn">
-                    <i class="fas fa-trash"></i> Delete
+                <button class="action-btn secondary" id="refresh-btn">
+                    <i class="fas fa-sync-alt"></i> Refresh
                 </button>
             </div>
         </div>
@@ -695,192 +1063,395 @@ function renderApplicationPanel(app) {
         <div class="app-overview">
             <div class="app-header">
                 <div class="app-icon">
-                    <i class="fas fa-shield-alt"></i>
+                    <i class="fas fa-${app.icon || 'shield'}"></i>
                 </div>
                 <div class="app-info">
                     <h2>${app.name}</h2>
-                    <div class="app-description">${app.description || 'No description provided'}</div>
+                    <div class="app-description">${app.description || 'No description provided.'}</div>
                 </div>
             </div>
             <div class="app-meta">
                 <div class="meta-item">
-                    <i class="fas fa-clock"></i>
-                    <span>Created on ${new Date(app.created_at).toLocaleDateString()}</span>
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Created: ${new Date(app.created_at).toLocaleDateString()}</span>
                 </div>
                 <div class="meta-item">
-                    <i class="fas fa-fingerprint"></i>
-                    <span>App ID: ${app.id}</span>
+                    <i class="fas fa-key"></i>
+                    <span>License Count: <span id="license-count">Loading...</span></span>
                 </div>
                 <div class="meta-item">
-                    <i class="fas fa-tag"></i>
-                    <span>Status: ${app.status || 'Active'}</span>
+                    <i class="fas fa-users"></i>
+                    <span>Active Users: <span id="active-users">Loading...</span></span>
                 </div>
             </div>
         </div>
         
-        <h2 class="section-title"><i class="fas fa-chart-bar"></i> Statistics</h2>
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-header">
-                    <div class="stat-title">Total Users</div>
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                </div>
-                <div class="stat-value">${app.users || 0}</div>
-                <div class="stat-change">
-                    <i class="fas fa-arrow-up"></i> ${app.user_growth || '0%'} this month
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-title">Active Licenses</div>
+                    <div class="stat-title">Total Licenses</div>
                     <div class="stat-icon">
                         <i class="fas fa-key"></i>
                     </div>
                 </div>
-                <div class="stat-value">${app.licenses || 0}</div>
+                <div class="stat-value" id="total-licenses">--</div>
                 <div class="stat-change">
-                    <i class="fas fa-arrow-up"></i> ${app.license_growth || '0%'} this month
+                    <i class="fas fa-arrow-up"></i> <span id="licenses-change">--</span>% this month
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-header">
-                    <div class="stat-title">Auth Requests</div>
+                    <div class="stat-title">Active Users</div>
                     <div class="stat-icon">
-                        <i class="fas fa-shield-alt"></i>
+                        <i class="fas fa-users"></i>
                     </div>
                 </div>
-                <div class="stat-value">${app.auth_requests || 0}</div>
+                <div class="stat-value" id="active-users-value">--</div>
                 <div class="stat-change">
-                    <i class="fas fa-arrow-up"></i> ${app.request_growth || '0%'} this week
+                    <i class="fas fa-arrow-up"></i> <span id="users-change">--</span>% this month
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-header">
-                    <div class="stat-title">Success Rate</div>
+                    <div class="stat-title">Verification Rate</div>
                     <div class="stat-icon">
                         <i class="fas fa-check-circle"></i>
                     </div>
                 </div>
-                <div class="stat-value">${app.success_rate || '0%'}</div>
+                <div class="stat-value" id="verification-rate">--</div>
                 <div class="stat-change">
-                    <i class="fas fa-arrow-up"></i> ${app.rate_change || '0%'} from last week
+                    <i class="fas fa-arrow-up"></i> <span id="verification-change">--</span>% this month
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Reset Requests</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="reset-requests">--</div>
+                <div class="stat-change negative">
+                    <i class="fas fa-arrow-down"></i> <span id="reset-change">--</span>% this month
                 </div>
             </div>
         </div>
         
-        <h2 class="section-title"><i class="fas fa-key"></i> API Authentication</h2>
         <div class="api-section">
-            <p>Use this secret key to authenticate API requests for this application.</p>
+            <div class="section-title">
+                <i class="fas fa-code"></i> API Access
+            </div>
             <div class="api-key-container">
-                <div class="api-key" id="api-key">${app.api_key || 'xxxx-xxxx-xxxx-xxxx'}</div>
-                <button class="copy-btn" id="copy-key-btn">
+                <div class="api-key" id="api-key">${app.api_key || 'N/A'}</div>
+                <button class="copy-btn" id="copy-api-key">
                     <i class="fas fa-copy"></i> Copy
                 </button>
             </div>
-            <button class="action-btn secondary" id="regenerate-key-btn">
+            <button class="action-btn secondary" id="regenerate-api-key">
                 <i class="fas fa-sync-alt"></i> Regenerate API Key
             </button>
+        </div>
+        
+        <div class="license-section">
+            <div class="license-header">
+                <div class="section-title">
+                    <i class="fas fa-key"></i> License Keys
+                </div>
+            </div>
+            <div id="license-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div>Loading license keys...</div>
+                </div>
+            </div>
         </div>
     `;
     
     // Add event listeners
-    document.getElementById('copy-key-btn').addEventListener('click', function() {
+    document.getElementById('generate-license-btn').addEventListener('click', () => {
+        openModal('generate-license-modal');
+    });
+    
+    document.getElementById('refresh-btn').addEventListener('click', () => {
+        location.reload();
+    });
+    
+    document.getElementById('copy-api-key').addEventListener('click', () => {
         const apiKey = document.getElementById('api-key').textContent;
-        navigator.clipboard.writeText(apiKey)
-            .then(() => {
-                showToast('API key copied to clipboard', 'success');
-            })
-            .catch(() => {
-                showToast('Failed to copy API key', 'error');
+        navigator.clipboard.writeText(apiKey).then(() => {
+            showToast('API key copied to clipboard', 'success');
+        });
+    });
+    
+    document.getElementById('regenerate-api-key').addEventListener('click', () => {
+        if (confirm('Are you sure you want to regenerate the API key? This will invalidate the current key.')) {
+            generateApiKey(app.id);
+        }
+    });
+    
+    // Load stats
+    loadApplicationStats(app.id);
+}
+
+// Render license keys
+function renderLicenseKeys(licenses) {
+    const licenseContainer = document.getElementById('license-container');
+    
+    if (!licenseContainer) return;
+    
+    if (!licenses || licenses.length === 0) {
+        licenseContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-key"></i>
+                <h3>No License Keys</h3>
+                <p>You haven't generated any license keys yet.</p>
+                <button class="action-btn" id="empty-generate-license-btn">
+                    <i class="fas fa-plus"></i> Generate Your First License
+                </button>
+            </div>
+        `;
+        
+        // Add event listener to the button
+        setTimeout(() => {
+            const emptyGenerateBtn = document.getElementById('empty-generate-license-btn');
+            if (emptyGenerateBtn) {
+                emptyGenerateBtn.addEventListener('click', () => {
+                    openModal('generate-license-modal');
+                });
+            }
+        }, 0);
+        
+        return;
+    }
+    
+    // Update license count
+    const licenseCountElements = document.querySelectorAll('#license-count, #total-licenses');
+    licenseCountElements.forEach(el => {
+        if (el) el.textContent = licenses.length;
+    });
+    
+    // Create license list
+    let licenseHTML = `<div class="license-list">`;
+    
+    licenses.forEach(license => {
+        const status = license.used ? 'used' : 'active';
+        const statusText = license.used ? 'Used' : 'Active';
+        const createdDate = new Date(license.created_at).toLocaleDateString();
+        
+        licenseHTML += `
+            <div class="license-item" data-id="${license.id}">
+                <div class="license-key">${license.key}</div>
+                <div class="license-status ${status}">${statusText}</div>
+                <div class="license-date">${createdDate}</div>
+                <div class="license-actions">
+                    <button class="license-btn copy-license" title="Copy License Key">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <button class="license-btn delete" title="Delete License Key">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    licenseHTML += `</div>`;
+    licenseContainer.innerHTML = licenseHTML;
+    
+    // Add event listeners for copy buttons
+    const copyButtons = document.querySelectorAll('.copy-license');
+    copyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const licenseItem = this.closest('.license-item');
+            const licenseKey = licenseItem.querySelector('.license-key').textContent;
+            
+            navigator.clipboard.writeText(licenseKey).then(() => {
+                showToast('License key copied to clipboard', 'success');
             });
+        });
     });
     
-    document.getElementById('regenerate-key-btn').addEventListener('click', function() {
-        if (confirm('Are you sure you want to regenerate the API key? This will invalidate the existing key.')) {
-            showToast('API key regenerated', 'success');
-            // In a real app, this would make an API call to regenerate the key
-        }
-    });
-    
-    document.getElementById('edit-app-btn').addEventListener('click', function() {
-        showToast('Edit functionality is not implemented yet', 'error');
-    });
-    
-    document.getElementById('delete-app-btn').addEventListener('click', function() {
-        if (confirm(`Are you sure you want to delete ${app.name}? This action cannot be undone.`)) {
-            showToast('Delete functionality is not implemented yet', 'error');
-        }
+    // Add event listeners for delete buttons
+    const deleteButtons = document.querySelectorAll('.license-btn.delete');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const licenseItem = this.closest('.license-item');
+            const licenseId = licenseItem.getAttribute('data-id');
+            
+            if (confirm('Are you sure you want to delete this license key? This action cannot be undone.')) {
+                deleteLicenseKey(licenseId);
+            }
+        });
     });
 }
 
-// Show application error
-function showApplicationError(title, message) {
-    const appContent = document.getElementById('app-content');
+// Load application stats
+function loadApplicationStats(appId) {
+    // Get credentials from localStorage
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
     
+    // API call to get application stats
+    fetch(`/api/getappstats?app_id=${appId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Basic ${btoa(username + ':' + password)}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to load application stats');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.success) {
+            // Update stats in UI
+            updateStatistics(data.stats);
+        } else {
+            throw new Error(data.message || 'Failed to load statistics');
+        }
+    })
+    .catch(error => {
+        console.error('Error loading stats:', error);
+        // Don't show full error to user, just handle gracefully
+    });
+}
+
+// Update statistics in UI
+function updateStatistics(stats) {
+    // Update active users
+    const activeUsersElements = document.querySelectorAll('#active-users, #active-users-value');
+    activeUsersElements.forEach(el => {
+        if (el) el.textContent = stats.active_users || 0;
+    });
+    
+    // Update licenses change percentage
+    const licensesChangeEl = document.getElementById('licenses-change');
+    if (licensesChangeEl) {
+        licensesChangeEl.textContent = stats.licenses_change || 0;
+    }
+    
+    // Update users change percentage
+    const usersChangeEl = document.getElementById('users-change');
+    if (usersChangeEl) {
+        usersChangeEl.textContent = stats.users_change || 0;
+    }
+    
+    // Update verification rate
+    const verificationRateEl = document.getElementById('verification-rate');
+    if (verificationRateEl) {
+        verificationRateEl.textContent = `${stats.verification_rate || 0}%`;
+    }
+    
+    // Update verification change percentage
+    const verificationChangeEl = document.getElementById('verification-change');
+    if (verificationChangeEl) {
+        verificationChangeEl.textContent = stats.verification_change || 0;
+    }
+    
+    // Update reset requests
+    const resetRequestsEl = document.getElementById('reset-requests');
+    if (resetRequestsEl) {
+        resetRequestsEl.textContent = stats.reset_requests || 0;
+    }
+    
+    // Update reset change percentage
+    const resetChangeEl = document.getElementById('reset-change');
+    if (resetChangeEl) {
+        resetChangeEl.textContent = stats.reset_change || 0;
+    }
+}
+
+// Show error message for application
+function showApplicationError(title, message) {
+    const loadingContainer = document.getElementById('loading-container');
+    loadingContainer.style.display = 'none';
+    
+    const appContent = document.getElementById('app-content');
     appContent.innerHTML = `
         <div class="error-container">
             <div class="error-icon">
-                <i class="fas fa-exclamation-circle"></i>
+                <i class="fas fa-exclamation-triangle"></i>
             </div>
             <h2 class="error-title">${title}</h2>
-            <p class="error-message">${message}</p>
+            <div class="error-message">${message}</div>
             <a href="/panel.html" class="action-btn">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                <i class="fas fa-arrow-left"></i> Return to Dashboard
             </a>
         </div>
     `;
 }
 
-// Toast notification functions
-const toast = document.getElementById('toast');
-const toastMessage = document.getElementById('toast-message');
-const toastClose = document.getElementById('toast-close');
-let toastTimeout;
-
+// Show toast notification
 function showToast(message, type = 'success') {
-    // Clear any existing timeout
-    if (toastTimeout) {
-        clearTimeout(toastTimeout);
-    }
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
     
-    // Set message and icon
-    toastMessage.textContent = message;
-    
+    // Set toast icon based on type
+    const toastIcon = toast.querySelector('i');
     if (type === 'success') {
-        toast.className = 'toast show success';
-        toast.querySelector('i').className = 'fas fa-check-circle';
-    } else {
-        toast.className = 'toast show error';
-        toast.querySelector('i').className = 'fas fa-exclamation-circle';
+        toastIcon.className = 'fas fa-check-circle';
+        toast.className = 'toast success';
+    } else if (type === 'error') {
+        toastIcon.className = 'fas fa-exclamation-circle';
+        toast.className = 'toast error';
     }
+    
+    // Set message
+    toastMessage.textContent = message;
     
     // Show toast
     toast.classList.add('show');
     
     // Hide toast after 3 seconds
-    toastTimeout = setTimeout(() => {
+    setTimeout(() => {
         toast.classList.remove('show');
     }, 3000);
 }
 
-toastClose.addEventListener('click', function() {
-    toast.classList.remove('show');
-    if (toastTimeout) {
-        clearTimeout(toastTimeout);
-    }
+// Open modal
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.add('show');
+}
+
+// Close modal
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.remove('show');
+}
+
+// Setup event listeners for license modal
+document.getElementById('close-license-modal').addEventListener('click', () => {
+    closeModal('generate-license-modal');
 });
 
-// Logout function
-document.getElementById('logout-btn').addEventListener('click', function() {
-    // Clear credentials from localStorage
-    localStorage.removeItem('cozy_username');
-    localStorage.removeItem('cozy_password');
+document.getElementById('cancel-license-btn').addEventListener('click', () => {
+    closeModal('generate-license-modal');
+});
+
+document.getElementById('confirm-generate-license').addEventListener('click', () => {
+    const appId = getApplicationId();
+    const level = document.getElementById('license-level').value;
+    const duration = document.getElementById('license-duration').value;
+    const quantity = parseInt(document.getElementById('license-quantity').value) || 1;
+    
+    generateLicenseKey(appId, level, duration, quantity);
+});
+
+// Close toast when clicking the close button
+document.getElementById('toast-close').addEventListener('click', () => {
+    document.getElementById('toast').classList.remove('show');
+});
+
+// Setup logout button
+document.getElementById('logout-btn').addEventListener('click', () => {
+    // Clear localStorage
+    localStorage.removeItem('username');
+    localStorage.removeItem('password');
     
     // Redirect to login page
     window.location.href = '/login.html';
 });
-    </script>
-</body>
-</html>
