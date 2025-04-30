@@ -1162,7 +1162,7 @@ function fetchApiKey() {
     })
     .catch(error => {
         console.error('Error fetching API key:', error);
-        document.getElementById('api-key-display').textContent = 'Failed to load API key';
+        document.getElementById('api-key-display').textContent = 'Seems you have no API Key. Click reset key to retrieve one!';
     });
 }
 
