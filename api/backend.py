@@ -9,6 +9,9 @@ import base64
 import os
 import datetime
 import random
+import uuid
+import hashlib
+import time
 
 app = Flask(__name__)
 
@@ -17,7 +20,8 @@ mongo_uri = "mongodb+srv://CozyAdmin:cozypassword@euphorixcluster.hpirebe.mongod
 client = MongoClient(mongo_uri)
 db = client["CozyDatabase"]
 users_collection = db["RegisteredUsers"]
-applications_collection = db["Applications"]  # New collection for applications
+applications_collection = db["Applications"]  # Collection for applications
+keys_collection = db["Keys"]  # Collection for keys
 
 # Encode password: base64 then convert to binary
 def encode_password(password):
@@ -36,6 +40,15 @@ def generate_app_id():
         existing_app = applications_collection.find_one({"app_id": app_id})
         if not existing_app:
             return app_id
+
+# Generate unique API key
+def generate_api_key():
+    # Generate a unique key based on UUID and current timestamp
+    unique_string = f"{uuid.uuid4()}-{time.time()}"
+    # Hash the string to create a consistent format
+    hashed = hashlib.sha256(unique_string.encode()).hexdigest()
+    # Return the first 32 characters as the API key
+    return hashed[:32]
 
 @app.route('/')
 def index():
@@ -64,7 +77,8 @@ def register():
     # Create user document
     user = {
         "Username": username,
-        "Password": encoded_password
+        "Password": encoded_password,
+        "api_keys": []  # Initialize empty api_keys array
     }
     
     # Insert user into database
@@ -99,9 +113,7 @@ def login():
     else:
         return jsonify({"error": "Invalid credentials"}), 401
 
-
-
-# New route: Create application
+# Create application route
 @app.route('/api/createapplication', methods=['POST'])
 def create_application():
     data = request.get_json()
@@ -133,6 +145,7 @@ def create_application():
         "app_id": app_id
     }), 201
 
+# Get applications route
 @app.route('/api/getapplications', methods=['GET', 'POST'])
 def get_applications():
     # Get authorization header
@@ -190,6 +203,203 @@ def get_applications():
             "message": "Applications retrieved successfully",
             "applications": applications
         }), 200
+
+# Route to retrieve API key for a user and app
+@app.route('/api/retrieveapikey', methods=['POST'])
+def retrieve_api_key():
+    data = request.get_json()
+    
+    # Check if required fields are provided
+    if not data or 'appId' not in data or 'username' not in data:
+        return jsonify({"error": "App ID and username are required"}), 400
+    
+    app_id = data['appId']
+    username = data['username']
+    limit = data.get('limit', 5)  # Default to 5 if not provided
+    page = data.get('page', 1)  # Default to page 1 if not provided
+    
+    # Find user in database
+    user = users_collection.find_one({"Username": username})
+    
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    # Check if the user has the api_keys field
+    if 'api_keys' not in user:
+        # Initialize empty api_keys field for user
+        users_collection.update_one(
+            {"Username": username},
+            {"$set": {"api_keys": []}}
+        )
+        return jsonify({"message": "No API keys found for this user"}), 404
+    
+    # Find the specific API key for the given app ID
+    api_key = None
+    for key in user.get('api_keys', []):
+        if key.get('app_id') == app_id:
+            api_key = key
+            break
+    
+    if not api_key:
+        return jsonify({"error": f"No API key found for app ID {app_id}"}), 404
+    
+    # Calculate pagination
+    skip = (page - 1) * limit
+    
+    return jsonify({
+        "message": "API key retrieved successfully",
+        "app_id": app_id,
+        "username": username,
+        "api_key": api_key.get('key'),
+        "created_at": api_key.get('created_at'),
+        "pagination": {
+            "page": page,
+            "limit": limit,
+            "total_pages": 1  # For a single API key, there's only 1 page
+        }
+    }), 200
+
+# Route to retrieve all keys and migrate users
+@app.route('/api/retrievekeys', methods=['GET'])
+def retrieve_keys():
+    # Check if Keys collection exists, if not create it
+    if "Keys" not in db.list_collection_names():
+        # Create the collection
+        db.create_collection("Keys")
+    
+    # Get all users
+    all_users = list(users_collection.find())
+    
+    # Migrate users to Keys collection if they don't have api_keys field
+    for user in all_users:
+        # Check if user already has api_keys field
+        if 'api_keys' not in user:
+            # Initialize empty api_keys field for user
+            users_collection.update_one(
+                {"_id": user["_id"]},
+                {"$set": {"api_keys": []}}
+            )
+        
+        # Check if user exists in Keys collection
+        existing_key_user = keys_collection.find_one({"username": user["Username"]})
+        if not existing_key_user:
+            # Add user to Keys collection
+            keys_collection.insert_one({
+                "username": user["Username"],
+                "keys": user.get("api_keys", [])
+            })
+    
+    # Retrieve all keys from Keys collection
+    all_keys = list(keys_collection.find({}, {"_id": 0}))
+    
+    return jsonify({
+        "message": "All keys retrieved successfully",
+        "keys": all_keys,
+        "total_users": len(all_users),
+        "total_keys": sum(len(user.get("keys", [])) for user in all_keys)
+    }), 200
+
+# Route to generate a new API key for a user and app
+@app.route('/api/newapikey', methods=['POST'])
+def new_api_key():
+    data = request.get_json()
+    
+    # Check if required fields are provided
+    if not data or 'appId' not in data or 'username' not in data:
+        return jsonify({"error": "App ID and username are required"}), 400
+    
+    app_id = data['appId']
+    username = data['username']
+    
+    # Verify the app exists
+    application = applications_collection.find_one({"app_id": app_id})
+    if not application:
+        return jsonify({"error": f"Application with ID {app_id} not found"}), 404
+    
+    # Find user in database
+    user = users_collection.find_one({"Username": username})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    # Generate a new API key
+    new_key = generate_api_key()
+    current_time = datetime.datetime.utcnow()
+    
+    # Prepare the API key object
+    api_key_obj = {
+        "app_id": app_id,
+        "key": new_key,
+        "created_at": current_time
+    }
+    
+    # Check if user already has api_keys field
+    if 'api_keys' not in user:
+        # Initialize api_keys as an empty list
+        users_collection.update_one(
+            {"Username": username},
+            {"$set": {"api_keys": []}}
+        )
+        
+    # Check if there's an existing key for this app
+    existing_key_index = None
+    for i, key in enumerate(user.get('api_keys', [])):
+        if key.get('app_id') == app_id:
+            existing_key_index = i
+            break
+    
+    if existing_key_index is not None:
+        # Replace the existing key for this app
+        update_query = {
+            "$set": {f"api_keys.{existing_key_index}": api_key_obj}
+        }
+    else:
+        # Add a new key for this app
+        update_query = {
+            "$push": {"api_keys": api_key_obj}
+        }
+    
+    # Update the user document
+    users_collection.update_one(
+        {"Username": username},
+        update_query
+    )
+    
+    # Also update Keys collection if it exists
+    if "Keys" in db.list_collection_names():
+        keys_doc = keys_collection.find_one({"username": username})
+        if keys_doc:
+            # Check if there's an existing key for this app in the Keys collection
+            existing_key_found = False
+            for i, key in enumerate(keys_doc.get('keys', [])):
+                if key.get('app_id') == app_id:
+                    # Update the existing key
+                    keys_collection.update_one(
+                        {"username": username},
+                        {"$set": {f"keys.{i}": api_key_obj}}
+                    )
+                    existing_key_found = True
+                    break
+            
+            if not existing_key_found:
+                # Add a new key
+                keys_collection.update_one(
+                    {"username": username},
+                    {"$push": {"keys": api_key_obj}}
+                )
+        else:
+            # Create a new document for this user
+            keys_collection.insert_one({
+                "username": username,
+                "keys": [api_key_obj]
+            })
+    
+    return jsonify({
+        "message": "API key generated successfully",
+        "app_id": app_id,
+        "username": username,
+        "api_key": new_key,
+        "created_at": current_time
+    }), 201
 
 if __name__ == '__main__':
     app.run(debug=True)
