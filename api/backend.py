@@ -117,7 +117,7 @@ def create_application():
     }), 201
 
 @app.route('/api/getapplications', methods=['GET'])
-def get_application():
+def get_applications():
     # Get authorization header
     auth_header = request.headers.get('Authorization')
     
@@ -133,11 +133,17 @@ def get_application():
     except Exception:
         return jsonify({"error": "Invalid authorization format"}), 401
     
-    # Verify user credentials
+    # Encode the provided password for comparison
     encoded_password = encode_password(password)
+    
+    # Find user in database
     user = users_collection.find_one({"Username": username})
     
-    if not user or user['Password'] != encoded_password:
+    # Validate credentials
+    if not user:
+        return jsonify({"error": "User not found"}), 401
+    
+    if user['Password'] != encoded_password:
         return jsonify({"error": "Invalid credentials"}), 401
     
     # If authenticated, retrieve all applications
