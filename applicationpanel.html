@@ -978,7 +978,6 @@
                                 </div>
                             
                                 <script>
-                                    // Application state
 // Application state
 const appState = {
     currentPage: 1,
@@ -1040,11 +1039,16 @@ function fetchApiKey() {
             username: appState.username
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data && data.api_key) {
-            appState.apiKey = data.apiKey;
-            document.getElementById('api-key-display').textContent = data.apiKey;
+            appState.apiKey = data.api_key; // Fix: Use data.api_key instead of data.apiKey
+            document.getElementById('api-key-display').textContent = data.api_key;
         } else {
             console.error('Invalid API key response', data);
             document.getElementById('api-key-display').textContent = 'Error loading API key';
@@ -1068,11 +1072,16 @@ function resetApiKey() {
             username: appState.username
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        if (data && data.apiKey) {
-            appState.apiKey = data.apiKey;
-            document.getElementById('api-key-display').textContent = data.apiKey;
+        if (data && data.api_key) {
+            appState.apiKey = data.api_key; // Fix: Use data.api_key instead of data.apiKey
+            document.getElementById('api-key-display').textContent = data.api_key;
             showNotification('API key has been reset successfully', 'success');
         } else {
             showNotification('Failed to reset API key', 'error');
@@ -1095,8 +1104,9 @@ function fetchLicenses() {
         </tr>
     `;
     
+    // Fix: Use the correct endpoint for retrieving keys
     fetch('/api/retrievekeys', {
-        method: 'POST',
+        method: 'POST', // This should match what the server expects
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${appState.apiKey}`
@@ -1115,9 +1125,11 @@ function fetchLicenses() {
         return response.json();
     })
     .then(data => {
-        if (data && Array.isArray(data.licenses)) {
-            displayLicenses(data.licenses);
-            updatePagination(data.total || data.licenses.length);
+        // Fix: Handle the actual data structure returned from the server
+        if (data && (Array.isArray(data.licenses) || Array.isArray(data.keys))) {
+            const licenses = data.licenses || data.keys || [];
+            displayLicenses(licenses);
+            updatePagination(data.total || licenses.length);
         } else {
             console.error('Invalid licenses response', data);
             tableBody.innerHTML = `
@@ -1159,8 +1171,7 @@ function generateLicenseKey() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'username': appState.username,
-            'password': localStorage.getItem('password') || ''
+            'Authorization': `Bearer ${appState.apiKey}` // Add the authorization header
         },
         body: JSON.stringify({
             appId: appState.appId,
@@ -1215,20 +1226,27 @@ function displayLicenses(licenses) {
     licenses.forEach(license => {
         const tr = document.createElement('tr');
         
+        // Get key data - adapt to whatever structure the server returns
+        const licenseKey = license.key || license.license_key || '';
+        const status = license.status || 'Active';
+        const created = license.created || new Date(license.created_at || Date.now()).toLocaleDateString();
+        const expires = license.expires || 'Never';
+        const lastUsed = license.lastUsed || license.last_used || 'Never';
+        
         // Determine status class
-        const statusClass = `status-${license.status.toLowerCase()}`;
+        const statusClass = `status-${status.toLowerCase()}`;
         
         tr.innerHTML = `
-            <td><span class="license-key">${license.key}</span></td>
-            <td><span class="status ${statusClass}">${license.status}</span></td>
-            <td>${license.created}</td>
-            <td>${license.expires}</td>
-            <td>${license.lastUsed}</td>
+            <td><span class="license-key">${licenseKey}</span></td>
+            <td><span class="status ${statusClass}">${status}</span></td>
+            <td>${created}</td>
+            <td>${expires}</td>
+            <td>${lastUsed}</td>
             <td>
                 <div class="table-actions">
-                    <button class="action-btn view-license" data-key="${license.key}"><i class="fas fa-eye"></i></button>
-                    <button class="action-btn edit-license" data-key="${license.key}"><i class="fas fa-edit"></i></button>
-                    <button class="action-btn delete delete-license" data-key="${license.key}"><i class="fas fa-trash-alt"></i></button>
+                    <button class="action-btn view-license" data-key="${licenseKey}"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn edit-license" data-key="${licenseKey}"><i class="fas fa-edit"></i></button>
+                    <button class="action-btn delete delete-license" data-key="${licenseKey}"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </td>
         `;
@@ -1389,8 +1407,7 @@ function setupEventListeners() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'username': appState.username,
-                'password': localStorage.getItem('password') || ''
+                'Authorization': `Bearer ${appState.apiKey}` // Add authorization header
             },
             body: JSON.stringify({
                 appId: appState.appId,
