@@ -906,15 +906,15 @@
                         </div>
                         <div class="api-info-item">
                             <div class="api-info-label">Owner</div>
-                            <div class="api-info-value" id="owner-username">JohnDoe</div>
+                            <div class="api-info-value" id="owner-username">NIL</div>
                         </div>
                         <div class="api-info-item">
                             <div class="api-info-label">Created</div>
-                            <div class="api-info-value" id="app-created-info">April 12, 2025</div>
+                            <div class="api-info-value" id="app-created-info">NIL</div>
                         </div>
                         <div class="api-info-item">
                             <div class="api-info-label">Last Updated</div>
-                            <div class="api-info-value" id="app-updated-info">April 27, 2025</div>
+                            <div class="api-info-value" id="app-updated-info">NIL</div>
                         </div>
                     </div>
                 </div>
@@ -1106,7 +1106,7 @@ function fetchLicenses() {
     
     // Fix: Use the correct endpoint for retrieving keys
     fetch('/api/retrievekeys', {
-        method: 'POST', // This should match what the server expects
+        method: 'GET', // This should match what the server expects
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${appState.apiKey}`
