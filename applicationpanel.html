@@ -923,7 +923,8 @@
                 <div class="card" id="licenses">
                     <div class="card-header">
                         <h2 class="card-title">License Keys</h2>
-                        <button class="btn btn-primary" id="create-license-btn">
+                        <button class="btn btn-primary" id="create-license-btn" >
+                            
                             <i class="fas fa-plus"></i>
                             Create License
                         </button>
@@ -1200,6 +1201,7 @@ function generateLicenseKey() {
 }
 
 // Display licenses in the table
+// Display licenses in the table
 function displayLicenses(licenses) {
     const tableBody = document.getElementById('license-table-body');
     tableBody.innerHTML = '';
@@ -1226,12 +1228,17 @@ function displayLicenses(licenses) {
     licenses.forEach(license => {
         const tr = document.createElement('tr');
         
-        // Get key data - adapt to whatever structure the server returns
-        const licenseKey = license.key || license.license_key || '';
+        // Get key data - adapt to the actual structure returned from API
+        const licenseKey = license.key || '';
+        
+        // Format dates if they exist
+        const createdDate = license.created_at ? new Date(license.created_at) : new Date();
+        const created = createdDate.toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
+        
+        // Default values for missing fields
         const status = license.status || 'Active';
-        const created = license.created || new Date(license.created_at || Date.now()).toLocaleDateString();
-        const expires = license.expires || 'Never';
-        const lastUsed = license.lastUsed || license.last_used || 'Never';
+        const expires = license.expires_at ? new Date(license.expires_at).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Never';
+        const lastUsed = license.last_used ? new Date(license.last_used).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Never';
         
         // Determine status class
         const statusClass = `status-${status.toLowerCase()}`;
@@ -1275,7 +1282,6 @@ function displayLicenses(licenses) {
         });
     });
 }
-
 // Update pagination information
 function updatePagination(total) {
     appState.totalLicenses = total;
