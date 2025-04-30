@@ -885,7 +885,7 @@
                     </div>
 
                     <div class="api-key-container">
-                        <div class="api-key" id="api-key-display">c8s7dg4a9d83h44kf88s3d6f5g4h9s2d1f3g4h6j7k8l9a0p2o4i5u6y7t8r</div>
+                        <div class="api-key" id="api-key-display">Loading</div>
                         <button class="copy-btn" id="copy-api-key">
                             <i class="fas fa-copy"></i>
                             Copy
@@ -1042,7 +1042,7 @@ function fetchApiKey() {
     })
     .then(response => response.json())
     .then(data => {
-        if (data && data.apiKey) {
+        if (data && data.api_key) {
             appState.apiKey = data.apiKey;
             document.getElementById('api-key-display').textContent = data.apiKey;
         } else {
