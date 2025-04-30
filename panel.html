@@ -679,6 +679,15 @@ async function verifyLogin(username, password) {
 // Load user applications
 function loadApplications() {
     const applicationsWrapper = document.getElementById('applications-wrapper');
+    
+    // First, clear any existing content and show loading
+    applicationsWrapper.innerHTML = `
+        <div class="loading" id="loading-container">
+            <div class="spinner"></div>
+            <div>Loading your applications...</div>
+        </div>
+    `;
+    
     const loadingContainer = document.getElementById('loading-container');
     
     // Get credentials from localStorage
@@ -695,8 +704,8 @@ function loadApplications() {
     })
     .then(response => response.json())
     .then(data => {
-        // Remove loading spinner
-        loadingContainer.remove();
+        // Clear the loading container by replacing all content
+        applicationsWrapper.innerHTML = '';
         
         const applications = data.applications || [];
         
@@ -740,7 +749,8 @@ function loadApplications() {
     })
     .catch(error => {
         console.error('Error loading applications:', error);
-        loadingContainer.remove();
+        
+        // Clear the loading spinner and show error state
         applicationsWrapper.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">
@@ -854,11 +864,11 @@ function createApplication() {
     .then(data => {
         // Check if the response has app_id which indicates success based on your API response
         if (data && data.app_id) {
-            // Load applications again to show the new one
-            loadApplications();
-            
             // Show success toast
             showToast('Application created successfully!', 'success');
+            
+            // Load applications again to show the new one
+            loadApplications();
         } else {
             throw new Error(data.message || 'Failed to create application');
         }
