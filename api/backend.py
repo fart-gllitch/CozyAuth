@@ -133,7 +133,7 @@ def create_application():
         "app_id": app_id
     }), 201
 
-@app.route('/api/getapplications', methods=['GET'])
+@app.route('/api/getapplications', methods=['GET', 'POST'])
 def get_applications():
     # Get authorization header
     auth_header = request.headers.get('Authorization')
@@ -163,13 +163,33 @@ def get_applications():
     if user['Password'] != encoded_password:
         return jsonify({"error": "Invalid credentials"}), 401
     
-    # If authenticated, retrieve all applications
-    applications = list(applications_collection.find({}, {"_id": 0}))
+    # Check if app_id was provided in either GET or POST request
+    app_id = None
     
-    return jsonify({
-        "message": "Applications retrieved successfully",
-        "applications": applications
-    }), 200
+    if request.method == 'GET':
+        app_id = request.args.get('app_id')
+    elif request.method == 'POST':
+        data = request.get_json()
+        app_id = data.get('app_id') if data else None
+    
+    # If app_id is provided, find that specific application
+    if app_id:
+        application = applications_collection.find_one({"app_id": app_id}, {"_id": 0})
+        if not application:
+            return jsonify({"error": f"Application with ID {app_id} not found"}), 404
+        
+        return jsonify({
+            "message": "Application retrieved successfully",
+            "application": application
+        }), 200
+    else:
+        # If no app_id, retrieve all applications
+        applications = list(applications_collection.find({}, {"_id": 0}))
+        
+        return jsonify({
+            "message": "Applications retrieved successfully",
+            "applications": applications
+        }), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
