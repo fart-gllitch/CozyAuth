@@ -762,7 +762,7 @@ function loadApplications() {
 function createApplicationCard(app) {
     const card = document.createElement('div');
     card.className = 'application-card';
-    card.setAttribute('data-app-id', app.id);
+    card.setAttribute('data-app-id', app.app_id);
     
     card.innerHTML = `
         <div class="app-header">
@@ -786,7 +786,7 @@ function createApplicationCard(app) {
     
     // Add click event to navigate to application panel
     card.addEventListener('click', function() {
-        window.location.href = `/applicationpanel.html?id=${app.id}`;
+        window.location.href = `/applicationpanel.html?id=${app.app_id}`;
     });
     
     return card;
@@ -850,15 +850,10 @@ function createApplication() {
             description: appDescription
         })
     })
-    .then(response => {
-        if (response.status === 201) {
-            return response.json();
-        } else {
-            throw new Error('Failed to create application');
-        }
-    })
+    .then(response => response.json())
     .then(data => {
-        if (data && data.success) {
+        // Check if the response has app_id which indicates success based on your API response
+        if (data && data.app_id) {
             // Load applications again to show the new one
             loadApplications();
             
