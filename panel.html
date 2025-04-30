@@ -810,7 +810,7 @@ function handleAppClick(appId, appName) {
     const password = localStorage.getItem('password');
     
     // Fetch application details from backend
-    fetch(`/api/getapplication`, {
+    fetch(`/api/getapplications`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -962,7 +962,7 @@ function showToast(message, type = 'success') {
         toast.className = 'toast show error';
         toast.querySelector('i').className = 'fas fa-exclamation-circle';
     }
-    
+     
     // Show toast
     toast.classList.add('show');
     
