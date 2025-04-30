@@ -989,12 +989,13 @@ const appState = {
     apiKey: ''
 };
 
-// Initialize app from localStorage and fetch necessary data
 document.addEventListener('DOMContentLoaded', function() {
+    // Create required DOM elements
+    createRequiredElements();
+    
     // Load application data from localStorage
-    let appData;
     try {
-        appData = JSON.parse(localStorage.getItem('current_app') || '{}');
+        const appData = JSON.parse(localStorage.getItem('current_app') || '{}');
         const appInfo = appData.details?.application || {};
         
         // Store app ID for API calls
@@ -1010,7 +1011,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set username
     appState.username = localStorage.getItem('username') || 'User';
-    document.getElementById('owner-username').textContent = appState.username;
+    if (document.getElementById('owner-username')) {
+        document.getElementById('owner-username').textContent = appState.username;
+    }
     
     // Fetch API Key
     fetchApiKey();
@@ -1021,12 +1024,114 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup event listeners
     setupEventListeners();
     
-    // Setup modals
-    setupModals();
-    
     // Setup theme toggle
     setupThemeToggle();
 });
+
+function createRequiredElements() {
+    // Create notification container if it doesn't exist
+    if (!document.querySelector('.notification-container')) {
+        const notificationContainer = document.createElement('div');
+        notificationContainer.className = 'notification-container';
+        document.body.appendChild(notificationContainer);
+    }
+    
+    // Add CSS for notifications if needed
+    if (!document.getElementById('dynamic-styles')) {
+        const styleEl = document.createElement('style');
+        styleEl.id = 'dynamic-styles';
+        styleEl.textContent = `
+            .notification-container {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .notification {
+                background: white;
+                border-left: 4px solid #2196F3;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                border-radius: 4px;
+                padding: 12px 15px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                min-width: 300px;
+                max-width: 400px;
+                transform: translateX(100%);
+                opacity: 0;
+                transition: all 0.3s ease;
+            }
+            
+            .notification.active {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            
+            .notification-success {
+                border-left-color: #4CAF50;
+            }
+            
+            .notification-error {
+                border-left-color: #F44336;
+            }
+            
+            .notification-info {
+                border-left-color: #2196F3;
+            }
+            
+            .notification-content {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .notification-content i {
+                font-size: 20px;
+                color: #2196F3;
+            }
+            
+            .notification-success .notification-content i {
+                color: #4CAF50;
+            }
+            
+            .notification-error .notification-content i {
+                color: #F44336;
+            }
+            
+            .notification-close {
+                background: none;
+                border: none;
+                font-size: 18px;
+                cursor: pointer;
+                color: #999;
+            }
+            
+            .notification-close:hover {
+                color: #333;
+            }
+            
+            /* For dark theme compatibility */
+            body.dark-theme .notification {
+                background: #2a2a2a;
+                color: #fff;
+            }
+            
+            body.dark-theme .notification-close {
+                color: #ccc;
+            }
+            
+            body.dark-theme .notification-close:hover {
+                color: #fff;
+            }
+        `;
+        document.head.appendChild(styleEl);
+    }
+}
 
 // Fetch API key from the server
 function fetchApiKey() {
@@ -1105,9 +1210,8 @@ function fetchLicenses() {
         </tr>
     `;
     
-    // Fix: Use the correct endpoint for retrieving keys
     fetch('/api/retrievekeys', {
-        method: 'POST', // This should match what the server expects
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${appState.apiKey}`
@@ -1126,20 +1230,43 @@ function fetchLicenses() {
         return response.json();
     })
     .then(data => {
-        // Fix: Handle the actual data structure returned from the server
-        if (data && (Array.isArray(data.licenses) || Array.isArray(data.keys))) {
-            const licenses = data.licenses || data.keys || [];
+        console.log('License data received:', data); // For debugging
+        
+        // Handle the nested structure in the API response
+        let licenses = [];
+        
+        if (data && Array.isArray(data.keys)) {
+            // Extract all license keys from the nested structure
+            data.keys.forEach(userKeysObj => {
+                if (userKeysObj && Array.isArray(userKeysObj.keys)) {
+                    licenses = licenses.concat(userKeysObj.keys);
+                }
+            });
+        }
+        
+        if (licenses.length > 0) {
             displayLicenses(licenses);
-            updatePagination(data.total || licenses.length);
+            updatePagination(data.total_keys || licenses.length);
         } else {
-            console.error('Invalid licenses response', data);
+            console.error('No licenses found in the response', data);
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="error-cell">
-                        Error loading licenses. Please try again.
+                    <td colspan="6" class="empty-cell">
+                        <div class="no-keys-message">
+                            No keys found! Maybe create one?
+                            <button class="btn btn-primary generate-key-btn" id="generate-first-key">
+                                <i class="fas fa-key"></i> Generate Key
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `;
+            
+            // Add event listener to the generate button
+            document.getElementById('generate-first-key')?.addEventListener('click', generateLicenseKey);
+            
+            // Update pagination to show 0 items
+            updatePagination(0);
         }
     })
     .catch(error => {
@@ -1165,14 +1292,17 @@ function fetchLicenses() {
         updatePagination(0);
     });
 }
-
+// Generate a new license key
 // Generate a new license key
 function generateLicenseKey() {
+    // Show notification that we're generating the key
+    showNotification('Generating license key...', 'info');
+    
     fetch('/api/generatekey', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${appState.apiKey}` // Add the authorization header
+            'Authorization': `Bearer ${appState.apiKey}`
         },
         body: JSON.stringify({
             appId: appState.appId,
@@ -1186,21 +1316,82 @@ function generateLicenseKey() {
         return response.json();
     })
     .then(data => {
-        if (data && data.key) {
+        console.log('License generation response:', data); // For debugging
+        if (data && (data.key || (data.keys && data.keys.length > 0))) {
             showNotification('License key created successfully!', 'success');
             // Refresh the license list
             fetchLicenses();
+            
+            // Close modal if it's open
+            const modal = document.getElementById('create-license-modal');
+            if (modal && modal.classList.contains('active')) {
+                modal.classList.remove('active');
+            }
         } else {
             showNotification('Failed to create license key', 'error');
         }
     })
     .catch(error => {
         console.error('Error generating license key:', error);
-        showNotification('Failed to create license key', 'error');
+        showNotification('Failed to create license key: ' + error.message, 'error');
     });
 }
 
-// Display licenses in the table
+// Setup event listeners for the entire application
+function setupEventListeners() {
+    // Copy API Key
+    document.getElementById('copy-api-key')?.addEventListener('click', function() {
+        const apiKey = document.getElementById('api-key-display').textContent;
+        navigator.clipboard.writeText(apiKey)
+            .then(function() {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            }.bind(this))
+            .catch(function(err) {
+                console.error('Could not copy text: ', err);
+            });
+    });
+    
+    // Reset API Key
+    document.getElementById('reset-key-btn')?.addEventListener('click', function() {
+        if (confirm('Are you sure you want to reset your API key? This will invalidate your current key.')) {
+            resetApiKey();
+        }
+    });
+    
+    // Search licenses
+    document.getElementById('search-licenses-btn')?.addEventListener('click', function() {
+        const searchTerm = document.getElementById('license-search').value.trim();
+        if (searchTerm) {
+            // Reset to first page when searching
+            appState.currentPage = 1;
+            // In a real app, you would update the search parameters and call fetchLicenses
+            fetchLicenses();
+        }
+    });
+    
+    // License search on enter key
+    document.getElementById('license-search')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('search-licenses-btn').click();
+        }
+    });
+    
+    // Create License buttons - there might be multiple ones
+    document.querySelectorAll('#create-license-btn, button#create-license-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Create license button clicked');
+            
+            // For simplicity, just call generateLicenseKey directly
+            generateLicenseKey();
+        });
+    });
+}
+
 // Display licenses in the table
 function displayLicenses(licenses) {
     const tableBody = document.getElementById('license-table-body');
@@ -1282,6 +1473,7 @@ function displayLicenses(licenses) {
         });
     });
 }
+
 // Update pagination information
 function updatePagination(total) {
     appState.totalLicenses = total;
@@ -1610,6 +1802,14 @@ function setupThemeToggle() {
 
 // Display a notification
 function showNotification(message, type = 'info') {
+    // First check if a notification container exists, if not create one
+    let notificationContainer = document.querySelector('.notification-container');
+    if (!notificationContainer) {
+        notificationContainer = document.createElement('div');
+        notificationContainer.className = 'notification-container';
+        document.body.appendChild(notificationContainer);
+    }
+    
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
@@ -1620,7 +1820,7 @@ function showNotification(message, type = 'info') {
         <button class="notification-close">&times;</button>
     `;
     
-    document.body.appendChild(notification);
+    notificationContainer.appendChild(notification);
     
     // Add active class after a small delay to trigger animation
     setTimeout(() => {
