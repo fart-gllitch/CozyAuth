@@ -688,8 +688,6 @@ function loadApplications() {
         </div>
     `;
     
-    const loadingContainer = document.getElementById('loading-container');
-    
     // Get credentials from localStorage
     const username = localStorage.getItem('username');
     const password = localStorage.getItem('password');
@@ -796,10 +794,53 @@ function createApplicationCard(app) {
     
     // Add click event to navigate to application panel
     card.addEventListener('click', function() {
-        window.location.href = `/applicationpanel.html?id=${app.app_id}`;
+        handleAppClick(app.app_id, app.name);
     });
     
     return card;
+}
+
+// Handle application click
+function handleAppClick(appId, appName) {
+    // Show loading state
+    showToast(`Loading application: ${appName}...`, 'success');
+    
+    // Get credentials from localStorage
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
+    
+    // Fetch application details from backend
+    fetch(`/api/getapplication`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${btoa(username + ':' + password)}`
+        },
+        body: JSON.stringify({
+            app_id: appId
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Failed to load application (${response.status})`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Store application data in localStorage for use in the application panel
+        localStorage.setItem('current_app', JSON.stringify({
+            id: appId,
+            name: appName,
+            details: data
+        }));
+        
+        // Navigate to application panel
+        window.location.href = `/applicationpanel.html?id=${appId}`;
+    })
+    .catch(error => {
+        console.error('Error loading application details:', error);
+        showToast(`Error: ${error.message}`, 'error');
+    });
 }
 
 // Create Application Modal Functions
