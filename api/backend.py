@@ -69,8 +69,8 @@ def login():
     if not data or 'Username' not in data or 'Password' not in data:
         return jsonify({"error": "Username and Password are required"}), 400
     
-    username = data['Username']
-    password = data['Password']
+    username = data['username']
+    password = data['password']
     
     # Encode the provided password for comparison
     encoded_password = encode_password(password)
