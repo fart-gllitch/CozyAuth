@@ -635,41 +635,64 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Verify user login with API
-function verifyLogin(username, password) {
-    // Actual API call to verify user credentials
-    fetch('/api/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            username: username,
-            password: password
-        })
-    })
-    .then(response => {
+async function verifyLogin(username, password) {
+    try {
+        // Input validation
+        if (!username || !password) {
+            throw new Error('Username and password are required');
+        }
+
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+        
         if (!response.ok) {
-            // If verification failed, log out
-            console.log('nope')
-            return;
+            // Handle specific error cases based on status code
+            console.error(`Login failed: ${data.message || 'Unknown error'}`);
+            
+            // Clear credentials on authentication failure
+            localStorage.removeItem('username');
+            localStorage.removeItem('password');
+            
+            // Provide meaningful error message
+            throw new Error(data.message || `Authentication failed (${response.status})`);
         }
-        return response.json();
-    })
-    .then(data => {
+        
         if (data && data.success) {
-            console.log('Login successfull');
+            console.log('Login successful');
+            
+            // Optionally store auth token instead of credentials
+            if (data.token) {
+                localStorage.setItem('authToken', data.token);
+            }
+            
+            return data;
         } else {
-            // If verification failed, log out
-            console.log('nope')
+            console.error('Login response did not contain success status');
+            throw new Error('Invalid login response');
         }
-    })
-    .catch(error => {
-        console.error('Error verifying login:', error);
-        // On error, assume verification failed
+    } catch (error) {
+        console.error('Error during login verification:', error);
+        
+        // Clear any stored credentials
         localStorage.removeItem('username');
         localStorage.removeItem('password');
+        localStorage.removeItem('authToken');
+        
+        // Redirect to login page
         window.location.href = '/login.html';
-    });
+        
+        throw error; // Rethrow to allow calling code to handle it
+    }
 }
 
 // Load user applications
