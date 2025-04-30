@@ -116,7 +116,7 @@ def create_application():
         "id": str(result.inserted_id)
     }), 201
 
-@app.route('/api/getapplication', methods=['GET'])
+@app.route('/api/getapplications', methods=['GET'])
 def get_application():
     # Get authorization header
     auth_header = request.headers.get('Authorization')

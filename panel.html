@@ -686,7 +686,11 @@ function loadApplications() {
         method: 'GET',
         headers: {
             'Authorization': `Basic ${btoa(localStorage.getItem('username') + ':' + localStorage.getItem('password'))}`
-        }
+        },
+        body: JSON.stringify({
+                Username: username,  // Capitalized to match backend expectation
+                Password: password   // Capitalized to match backend expectation
+            })
     })
     .then(response => response.json())
     .then(data => {
