@@ -262,6 +262,20 @@ def retrieve_api_key():
 # Route to retrieve all keys and migrate users
 @app.route('/api/retrievekeys', methods=['GET', 'POST'])
 def retrieve_keys():
+    # Check if app_id is provided in the request
+    if request.method == 'POST':
+        data = request.get_json()
+        app_id = data.get('app_id')
+    else:  # GET method
+        app_id = request.args.get('app_id')
+    
+    # Return error if app_id is not provided
+    if not app_id:
+        return jsonify({
+            "error": "Missing app_id parameter",
+            "message": "Please provide an app_id to retrieve the associated keys"
+        }), 400
+    
     # Check if Keys collection exists, if not create it
     if "Keys" not in db.list_collection_names():
         # Create the collection
@@ -289,14 +303,29 @@ def retrieve_keys():
                 "keys": user.get("api_keys", [])
             })
     
-    # Retrieve all keys from Keys collection
-    all_keys = list(keys_collection.find({}, {"_id": 0}))
+    # Retrieve all keys from Keys collection that match the app_id
+    matching_keys = []
+    all_key_users = list(keys_collection.find({}, {"_id": 0}))
+    
+    for user in all_key_users:
+        username = user["username"]
+        # Filter keys for this user that match the app_id
+        matching_user_keys = [
+            key for key in user.get("keys", []) 
+            if key.get("app_id") == app_id
+        ]
+        
+        if matching_user_keys:
+            matching_keys.append({
+                "username": username,
+                "keys": matching_user_keys
+            })
     
     return jsonify({
-        "message": "All keys retrieved successfully",
-        "keys": all_keys,
-        "total_users": len(all_users),
-        "total_keys": sum(len(user.get("keys", [])) for user in all_keys)
+        "message": f"Keys retrieved successfully for app_id: {app_id}",
+        "keys": matching_keys,
+        "total_users": len(matching_keys),
+        "total_keys": sum(len(user.get("keys", [])) for user in matching_keys)
     }), 200
 
 # Route to generate a new API key for a user and app
