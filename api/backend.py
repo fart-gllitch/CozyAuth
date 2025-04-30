@@ -430,5 +430,308 @@ def new_api_key():
         "created_at": current_time
     }), 201
 
+@app.route('/api/verify', methods=['POST'])
+def verify_license():
+    # Get form data
+    api_key = request.form.get('api_key')
+    license_key = request.form.get('license')
+    
+    # Validate inputs
+    if not api_key or not license_key:
+        return jsonify({"error": "API key and license key are required"}), 400
+    
+    # Check if API key exists in any user
+    key_found = False
+    app_id = None
+    
+    # Check in Keys collection first (more efficient)
+    if "Keys" in db.list_collection_names():
+        all_users = list(keys_collection.find())
+        for user in all_users:
+            for key in user.get("keys", []):
+                if key.get("key") == api_key:
+                    key_found = True
+                    app_id = key.get("app_id")
+                    break
+            if key_found:
+                break
+    
+    # If not found in Keys collection, check in users
+    if not key_found:
+        all_users = list(users_collection.find())
+        for user in all_users:
+            for key in user.get("api_keys", []):
+                if key.get("key") == api_key:
+                    key_found = True
+                    app_id = key.get("app_id")
+                    break
+            if key_found:
+                break
+    
+    # If API key not found
+    if not key_found:
+        return jsonify({"error": "Invalid API key"}), 401
+    
+    # Create a new collection for licenses if it doesn't exist
+    if "Licenses" not in db.list_collection_names():
+        db.create_collection("Licenses")
+    
+    licenses_collection = db["Licenses"]
+    
+    # Check if license exists
+    license_doc = licenses_collection.find_one({"license_key": license_key, "app_id": app_id})
+    
+    if license_doc:
+        # Check if license is expired
+        if "expiration_date" in license_doc:
+            expiration_date = license_doc["expiration_date"]
+            if expiration_date < datetime.datetime.utcnow():
+                return jsonify({"status": "Expired", "message": "License has expired"}), 200
+        
+        # Return verification success
+        return jsonify({"status": "Verified", "message": "License is valid"}), 200
+    else:
+        # License not found
+        return jsonify({"status": "Invalid", "message": "License not found"}), 200
+
+# Generate license route
+@app.route('/api/generatelicense', methods=['POST'])
+def generate_license():
+    data = request.get_json()
+    
+    # Check if required fields are provided
+    if not data or 'app_id' not in data or 'username' not in data:
+        return jsonify({"error": "App ID and username are required"}), 400
+    
+    app_id = data['app_id']
+    username = data['username']
+    days_valid = data.get('days_valid', 30)  # Default 30 days validity
+    
+    # Verify app exists
+    application = applications_collection.find_one({"app_id": app_id})
+    if not application:
+        return jsonify({"error": f"Application with ID {app_id} not found"}), 404
+    
+    # Verify user exists
+    user = users_collection.find_one({"Username": username})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    # Generate unique license key
+    license_key = generate_license_key()
+    
+    # Calculate expiration date
+    expiration_date = datetime.datetime.utcnow() + datetime.timedelta(days=days_valid)
+    
+    # Create licenses collection if it doesn't exist
+    if "Licenses" not in db.list_collection_names():
+        db.create_collection("Licenses")
+    
+    licenses_collection = db["Licenses"]
+    
+    # Create license document
+    license_doc = {
+        "license_key": license_key,
+        "app_id": app_id,
+        "username": username,
+        "creation_date": datetime.datetime.utcnow(),
+        "expiration_date": expiration_date,
+        "is_active": True
+    }
+    
+    # Insert license into database
+    result = licenses_collection.insert_one(license_doc)
+    
+    return jsonify({
+        "message": "License generated successfully",
+        "license_key": license_key,
+        "app_id": app_id,
+        "username": username,
+        "expiration_date": expiration_date.isoformat(),
+        "days_valid": days_valid
+    }), 201
+
+# Function to generate a license key
+def generate_license_key():
+    # Generate a unique key with a specific format that's easy to read
+    parts = []
+    for _ in range(4):
+        # Generate a random 5-character segment
+        segment = ''.join(random.choices('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', k=5))
+        parts.append(segment)
+    
+    # Join segments with hyphens
+    license_key = '-'.join(parts)
+    
+    # Check if this key already exists in the database
+    if "Licenses" in db.list_collection_names():
+        licenses_collection = db["Licenses"]
+        existing_license = licenses_collection.find_one({"license_key": license_key})
+        if existing_license:
+            # Recursively generate another key
+            return generate_license_key()
+    
+    return license_key
+
+# Route to get all licenses for a user
+@app.route('/api/getlicenses', methods=['POST'])
+def get_licenses():
+    data = request.get_json()
+    
+    # Check if required fields are provided
+    if not data or 'username' not in data:
+        return jsonify({"error": "Username is required"}), 400
+    
+    username = data['username']
+    app_id = data.get('app_id')  # Optional filter by app ID
+    
+    # Verify user exists
+    user = users_collection.find_one({"Username": username})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    # Check if Licenses collection exists
+    if "Licenses" not in db.list_collection_names():
+        return jsonify({"message": "No licenses found", "licenses": []}), 200
+    
+    licenses_collection = db["Licenses"]
+    
+    # Build query
+    query = {"username": username}
+    if app_id:
+        query["app_id"] = app_id
+    
+    # Find all licenses for this user (and optionally app)
+    licenses = list(licenses_collection.find(query, {"_id": 0}))
+    
+    # Convert datetime objects to ISO format strings
+    for license in licenses:
+        if "creation_date" in license:
+            license["creation_date"] = license["creation_date"].isoformat()
+        if "expiration_date" in license:
+            license["expiration_date"] = license["expiration_date"].isoformat()
+    
+    return jsonify({
+        "message": "Licenses retrieved successfully",
+        "username": username,
+        "app_id": app_id if app_id else "all",
+        "licenses": licenses,
+        "count": len(licenses)
+    }), 200
+
+# Route to revoke a license
+@app.route('/api/revokelicense', methods=['POST'])
+def revoke_license():
+    data = request.get_json()
+    
+    # Check if required fields are provided
+    if not data or 'license_key' not in data:
+        return jsonify({"error": "License key is required"}), 400
+    
+    license_key = data['license_key']
+    
+    # Check if Licenses collection exists
+    if "Licenses" not in db.list_collection_names():
+        return jsonify({"error": "License not found"}), 404
+    
+    licenses_collection = db["Licenses"]
+    
+    # Find the license
+    license_doc = licenses_collection.find_one({"license_key": license_key})
+    if not license_doc:
+        return jsonify({"error": "License not found"}), 404
+    
+    # Update the license to be inactive
+    licenses_collection.update_one(
+        {"license_key": license_key},
+        {"$set": {"is_active": False}}
+    )
+    
+    return jsonify({
+        "message": "License revoked successfully",
+        "license_key": license_key
+    }), 200
+
+# Route to get dashboard statistics
+@app.route('/api/dashboardstats', methods=['GET'])
+def dashboard_stats():
+    # Get authorization header
+    auth_header = request.headers.get('Authorization')
+    
+    # Check if Authorization header is provided
+    if not auth_header or not auth_header.startswith('Basic '):
+        return jsonify({"error": "Authorization required"}), 401
+    
+    # Extract and decode credentials from Basic auth
+    try:
+        encoded_credentials = auth_header.split(' ')[1]
+        decoded_credentials = base64.b64decode(encoded_credentials).decode('utf-8')
+        username, password = decoded_credentials.split(':')
+    except Exception:
+        return jsonify({"error": "Invalid authorization format"}), 401
+    
+    # Encode the provided password for comparison
+    encoded_password = encode_password(password)
+    
+    # Find user in database
+    user = users_collection.find_one({"Username": username})
+    
+    # Validate credentials
+    if not user:
+        return jsonify({"error": "User not found"}), 401
+    
+    if user['Password'] != encoded_password:
+        return jsonify({"error": "Invalid credentials"}), 401
+    
+    # Collect statistics
+    stats = {}
+    
+    # Count total applications
+    stats["total_applications"] = applications_collection.count_documents({})
+    
+    # Count total users
+    stats["total_users"] = users_collection.count_documents({})
+    
+    # Count total API keys
+    api_key_count = 0
+    all_keys = list(keys_collection.find({}))
+    for user_keys in all_keys:
+        api_key_count += len(user_keys.get("keys", []))
+    stats["total_api_keys"] = api_key_count
+    
+    # Count total licenses if collection exists
+    stats["total_licenses"] = 0
+    if "Licenses" in db.list_collection_names():
+        licenses_collection = db["Licenses"]
+        stats["total_licenses"] = licenses_collection.count_documents({})
+        
+        # Count active licenses
+        stats["active_licenses"] = licenses_collection.count_documents({"is_active": True})
+        
+        # Count expired licenses
+        stats["expired_licenses"] = licenses_collection.count_documents({
+            "expiration_date": {"$lt": datetime.datetime.utcnow()}
+        })
+    
+    # Get user's applications
+    user_apps = []
+    if 'api_keys' in user:
+        app_ids = set()
+        for key in user['api_keys']:
+            app_ids.add(key.get('app_id'))
+        
+        for app_id in app_ids:
+            app = applications_collection.find_one({"app_id": app_id}, {"_id": 0})
+            if app:
+                user_apps.append(app)
+    
+    stats["user_applications"] = user_apps
+    
+    return jsonify({
+        "message": "Dashboard statistics retrieved successfully",
+        "username": username,
+        "stats": stats
+    }), 200
+
 if __name__ == '__main__':
     app.run(debug=True)
