@@ -639,7 +639,7 @@ function loadApplicationData(appId) {
     const password = localStorage.getItem('password');
     
     // Actual API call to get application details
-    fetch(`/api/checkapplication?id=${appId}`, {
+    fetch(`/api/getapplications?id=${appId}`, {
         method: 'GET',
         headers: {
             'Authorization': `Basic ${btoa(username + ':' + password)}`,
