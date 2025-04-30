@@ -659,7 +659,7 @@ function verifyLogin(username, password) {
     })
     .then(data => {
         if (data && data.success) {
-            console.log('Login verified successfully');
+            console.log('Login successfull');
         } else {
             // If verification failed, log out
             localStorage.removeItem('username');
