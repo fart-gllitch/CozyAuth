@@ -1048,91 +1048,22 @@
                     <div class="card-header">
                         <h2 class="card-title">Active Users</h2>
                         <button class="btn btn-secondary">
-                            <i class="fas fa-download"></i>
-                            Export Users
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh Users
                         </button>
                     </div>
 
                     <div class="license-form">
-                        <input type="text" class="form-input" placeholder="Search users...">
-                        <select class="form-select">
-                            <option value="all">All Users</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                        <button class="btn btn-secondary">
+                        <input type="text" class="form-input" id="user-search" placeholder="Search users...">
+                        <button class="btn btn-secondary" id="search-users-btn">
                             <i class="fas fa-search"></i>
                             Search
                         </button>
                     </div>
 
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Username</th>
-                                    <th>License Key</th>
-                                    <th>IP Address</th>
-                                    <th>Last Login</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>user123</td>
-                                    <td><span class="license-key">COZY-4F5G-H6J7-K8L9-M0N1</span></td>
-                                    <td>192.168.1.45</td>
-                                    <td>2 hours ago</td>
-                                    <td><span class="status status-active">Active</span></td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
-                                            <button class="action-btn delete"><i class="fas fa-ban"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>alex89</td>
-                                    <td><span class="license-key">COZY-5G6H-7J8K-9L0M-1N2P</span></td>
-                                    <td>84.23.107.182</td>
-                                    <td>Yesterday</td>
-                                    <td><span class="status status-active">Active</span></td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
-                                            <button class="action-btn delete"><i class="fas fa-ban"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>maria2025</td>
-                                    <td><span class="license-key">COZY-7J8K-9L0M-1N2P-3Q4R</span></td>
-                                    <td>172.32.45.67</td>
-                                    <td>5 minutes ago</td>
-                                    <td><span class="status status-active">Active</span></td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
-                                            <button class="action-btn delete"><i class="fas fa-ban"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>robtech</td>
-                                    <td><span class="license-key">COZY-8K9L-0M1N-2P3Q-4R5S</span></td>
-                                    <td>198.45.67.89</td>
-                                    <td>1 day ago</td>
-                                    <td><span class="status status-active">Active</span></td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="action-btn"><i class="fas fa-eye"></i></button>
-                                            <button class="action-btn delete"><i class="fas fa-ban"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div id="active-users-container">
+                        <!-- Active users will be loaded dynamically -->
+                        <div class="loading-spinner">Loading users...</div>
                     </div>
 
                     <div class="table-footer">
@@ -1293,18 +1224,52 @@
     </div>
 
     <script>
-        // Initialize username display from localStorage or use default
+        // Initialize app from localStorage and fetch necessary data
         document.addEventListener('DOMContentLoaded', function() {
-            const storedUsername = localStorage.getItem('username') || 'NIL';
+            // Load application data from localStorage
+            let appData;
+            try {
+                appData = JSON.parse(localStorage.getItem('current_app') || '{}');
+                const appInfo = appData.details?.application || {};
+                
+                // Update application info in UI
+                document.getElementById('app-name-display').textContent = appInfo.name || 'My Application';
+                document.getElementById('app-name-info').textContent = appInfo.name || 'My Application';
+                document.getElementById('app-created-display').textContent = `Created on ${new Date(appInfo.created_at).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'})}`;
+                document.getElementById('app-created-info').textContent = new Date(appInfo.created_at).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
+                document.getElementById('app-id-info').textContent = appInfo.app_id || 'Unknown';
+            } catch (error) {
+                console.error('Error parsing app data:', error);
+            }
+            
+            // Set username
+            const storedUsername = localStorage.getItem('username') || 'User';
             const userInitial = storedUsername.charAt(0).toUpperCase();
             
             document.getElementById('username-display').textContent = storedUsername;
             document.getElementById('owner-username').textContent = storedUsername;
             document.getElementById('user-avatar-initial').textContent = userInitial;
             
+            // Fetch API Key
+            fetch('/api/genapikey')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('api-key-display').textContent = data.key || 'Error loading API key';
+                })
+                .catch(error => {
+                    console.error('Error fetching API key:', error);
+                    document.getElementById('api-key-display').textContent = 'Failed to load API key';
+                });
+            
+            // Fetch Licenses
+            fetchLicenses();
+            
+            // Fetch Active Users
+            fetchActiveUsers();
+            
             // Copy API Key functionality
             document.getElementById('copy-api-key').addEventListener('click', function() {
-                const apiKey = document.querySelector('.api-key').textContent;
+                const apiKey = document.getElementById('api-key-display').textContent;
                 navigator.clipboard.writeText(apiKey).then(function() {
                     const originalText = document.getElementById('copy-api-key').innerHTML;
                     document.getElementById('copy-api-key').innerHTML = '<i class="fas fa-check"></i> Copied!';
@@ -1315,40 +1280,163 @@
             });
             
             // Modal functionality
+            setupModals();
+        });
+        
+        // Fetch licenses
+        function fetchLicenses() {
+            const licenseList = document.getElementById('license-list');
+            licenseList.innerHTML = '<div class="loading-spinner">Loading licenses...</div>';
+            
+            // Sample licenses (in real app, fetch from API)
+            const licenses = [
+                { key: 'COZY-4F5G-H6J7-K8L9-M0N1', status: 'active', created: 'Apr 15, 2025', expires: 'Apr 15, 2026', lastUsed: '2 hours ago' },
+                { key: 'COZY-5G6H-7J8K-9L0M-1N2P', status: 'used', created: 'Apr 10, 2025', expires: 'Apr 10, 2026', lastUsed: 'Yesterday' },
+                { key: 'COZY-6H7J-8K9L-0M1N-2P3Q', status: 'expired', created: 'Mar 15, 2024', expires: 'Mar 15, 2025', lastUsed: '45 days ago' }
+            ];
+            
+            displayLicenses(licenses);
+        }
+        
+        // Display licenses as list items
+        function displayLicenses(licenses) {
+            const listContainer = document.getElementById('license-list');
+            listContainer.innerHTML = '';
+            
+            const ul = document.createElement('ul');
+            ul.className = 'license-items';
+            
+            licenses.forEach(license => {
+                const li = document.createElement('li');
+                li.className = 'license-item';
+                li.innerHTML = `
+                    <div class="license-key-block">
+                        <span class="license-key">${license.key}</span>
+                        <span class="status status-${license.status}">${license.status}</span>
+                    </div>
+                    <div class="license-details">
+                        <span>Created: ${license.created}</span>
+                        <span>Expires: ${license.expires}</span>
+                        <span>Last Used: ${license.lastUsed}</span>
+                    </div>
+                    <div class="license-actions">
+                        <button class="action-btn"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn delete"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                `;
+                ul.appendChild(li);
+            });
+            
+            listContainer.appendChild(ul);
+        }
+        
+        // Fetch active users
+        function fetchActiveUsers() {
+            const usersContainer = document.getElementById('active-users-container');
+            usersContainer.innerHTML = '<div class="loading-spinner">Loading users...</div>';
+            
+            fetch('/api/active_users')
+                .then(response => response.json())
+                .then(data => {
+                    displayActiveUsers(data.users || []);
+                })
+                .catch(error => {
+                    console.error('Error fetching active users:', error);
+                    usersContainer.innerHTML = '<div class="error-message">Failed to load active users</div>';
+                    
+                    // Fallback to sample data
+                    const sampleUsers = [
+                        { username: 'user123', license: 'COZY-4F5G-H6J7-K8L9-M0N1', ip: '192.168.1.45', lastLogin: '2 hours ago' },
+                        { username: 'alex89', license: 'COZY-5G6H-7J8K-9L0M-1N2P', ip: '84.23.107.182', lastLogin: 'Yesterday' }
+                    ];
+                    displayActiveUsers(sampleUsers);
+                });
+        }
+        
+        // Display active users
+        function displayActiveUsers(users) {
+            const container = document.getElementById('active-users-container');
+            container.innerHTML = '';
+            
+            if (users.length === 0) {
+                container.innerHTML = '<div class="empty-state">No active users found</div>';
+                return;
+            }
+            
+            const userList = document.createElement('div');
+            userList.className = 'user-list';
+            
+            users.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                userItem.innerHTML = `
+                    <div class="user-primary">
+                        <div class="user-name">${user.username}</div>
+                        <div class="user-license">${user.license}</div>
+                    </div>
+                    <div class="user-secondary">
+                        <div class="user-ip">${user.ip}</div>
+                        <div class="user-last-login">${user.lastLogin}</div>
+                    </div>
+                    <div class="user-actions">
+                        <button class="action-btn"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn delete"><i class="fas fa-ban"></i></button>
+                    </div>
+                `;
+                userList.appendChild(userItem);
+            });
+            
+            container.appendChild(userList);
+        }
+        
+        // Set up modal interactions
+        function setupModals() {
             const createLicenseBtn = document.getElementById('create-license-btn');
             const closeLicenseModal = document.getElementById('close-license-modal');
             const cancelLicenseBtn = document.getElementById('cancel-license-btn');
             const licenseModal = document.getElementById('create-license-modal');
             
-            createLicenseBtn.addEventListener('click', function() {
-                licenseModal.classList.add('active');
-            });
+            if (createLicenseBtn) {
+                createLicenseBtn.addEventListener('click', function() {
+                    licenseModal.classList.add('active');
+                });
+            }
             
-            closeLicenseModal.addEventListener('click', function() {
-                licenseModal.classList.remove('active');
-            });
+            if (closeLicenseModal) {
+                closeLicenseModal.addEventListener('click', function() {
+                    licenseModal.classList.remove('active');
+                });
+            }
             
-            cancelLicenseBtn.addEventListener('click', function() {
-                licenseModal.classList.remove('active');
-            });
+            if (cancelLicenseBtn) {
+                cancelLicenseBtn.addEventListener('click', function() {
+                    licenseModal.classList.remove('active');
+                });
+            }
             
-            // Add Variable Modal
             const addVariableBtn = document.getElementById('add-variable-btn');
             const closeVariableModal = document.getElementById('close-variable-modal');
             const cancelVariableBtn = document.getElementById('cancel-variable-btn');
             const variableModal = document.getElementById('add-variable-modal');
             
-            addVariableBtn.addEventListener('click', function() {
-                variableModal.classList.add('active');
-            });
+            if (addVariableBtn) {
+                addVariableBtn.addEventListener('click', function() {
+                    variableModal.classList.add('active');
+                });
+            }
             
-            closeVariableModal.addEventListener('click', function() {
-                variableModal.classList.remove('active');
-            });
+            if (closeVariableModal) {
+                closeVariableModal.addEventListener('click', function() {
+                    variableModal.classList.remove('active');
+                });
+            }
             
-            cancelVariableBtn.addEventListener('click', function() {
-                variableModal.classList.remove('active');
-            });
+            if (cancelVariableBtn) {
+                cancelVariableBtn.addEventListener('click', function() {
+                    variableModal.classList.remove('active');
+                });
+            }
             
             // Close modals when clicking outside
             window.addEventListener('click', function(event) {
@@ -1359,19 +1447,7 @@
                     variableModal.classList.remove('active');
                 }
             });
-            
-            // License type change handler
-            const licenseTypeSelect = document.querySelector('.modal-form .form-select');
-            const expiryDateInput = document.querySelector('.modal-form input[type="date"]');
-            
-            licenseTypeSelect.addEventListener('change', function() {
-                if (this.value === 'custom') {
-                    expiryDateInput.disabled = false;
-                } else {
-                    expiryDateInput.disabled = true;
-                }
-            });
-        });
+        }
     </script>
 </body>
 </html>
