@@ -717,10 +717,17 @@ function loadApplications() {
             
             // Add event listener to the empty state button
             document.getElementById('empty-create-btn').addEventListener('click', openCreateModal);
+            
+            // Clear any previously stored app IDs
+            localStorage.setItem('owned_appids', JSON.stringify([]));
         } else {
             // Create applications grid
             const applicationsContainer = document.createElement('div');
             applicationsContainer.className = 'applications-container';
+            
+            // Extract app IDs and store them in localStorage
+            const appIds = applications.map(app => app.app_id);
+            localStorage.setItem('owned_appids', JSON.stringify(appIds));
             
             // Add application cards
             applications.forEach(app => {

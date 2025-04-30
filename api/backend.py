@@ -8,6 +8,7 @@ from pymongo import MongoClient
 import base64
 import os
 import datetime
+import random
 
 app = Flask(__name__)
 
@@ -24,6 +25,17 @@ def encode_password(password):
     base64_bytes = base64.b64encode(password.encode('utf-8'))
     # Return as string
     return base64_bytes.decode('utf-8')
+
+# Generate unique 5-digit app ID
+def generate_app_id():
+    while True:
+        # Generate random 5-digit number
+        app_id = str(random.randint(10000, 99999))
+        
+        # Check if this ID already exists in the database
+        existing_app = applications_collection.find_one({"app_id": app_id})
+        if not existing_app:
+            return app_id
 
 @app.route('/')
 def index():
@@ -101,8 +113,12 @@ def create_application():
     name = data['name']
     description = data['description']
     
+    # Generate a unique 5-digit app ID
+    app_id = generate_app_id()
+    
     # Create application document
     application = {
+        "app_id": app_id,
         "name": name,
         "description": description,
         "created_at": datetime.datetime.utcnow()  # Add timestamp
@@ -113,7 +129,8 @@ def create_application():
     
     return jsonify({
         "message": "Application created successfully", 
-        "id": str(result.inserted_id)
+        "id": str(result.inserted_id),
+        "app_id": app_id
     }), 201
 
 @app.route('/api/getapplications', methods=['GET'])

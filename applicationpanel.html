@@ -615,11 +615,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Load application data
 function loadApplicationData(appId) {
+    // Check if the appId is specified, otherwise try to get it from current context
+    if (!appId) {
+        // Try to get the appId from URL parameters or other current context
+        const urlParams = new URLSearchParams(window.location.search);
+        appId = urlParams.get('id');
+        
+        // If still no appId, check if we're viewing the first app from owned apps
+        if (!appId) {
+            const ownedAppIds = JSON.parse(localStorage.getItem('owned_appids') || '[]');
+            appId = ownedAppIds.length > 0 ? ownedAppIds[0] : null;
+        }
+        
+        // If we still don't have an appId, show an error
+        if (!appId) {
+            showApplicationError('Application Error', 'No application ID specified');
+            return;
+        }
+    }
+    
+    // Get credentials from localStorage
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
+    
     // Actual API call to get application details
     fetch(`/api/checkapplication?id=${appId}`, {
         method: 'GET',
         headers: {
-            'Authorization': `Basic ${btoa(localStorage.getItem('cozy_username') + ':' + localStorage.getItem('cozy_password'))}`
+            'Authorization': `Basic ${btoa(username + ':' + password)}`,
+            'Content-Type': 'application/json'
         }
     })
     .then(response => {
@@ -632,6 +656,14 @@ function loadApplicationData(appId) {
         if (data && data.success) {
             // Render application details
             renderApplicationPanel(data.application);
+            
+            // Verify this app_id is in our owned apps list
+            const ownedAppIds = JSON.parse(localStorage.getItem('owned_appids') || '[]');
+            if (!ownedAppIds.includes(data.application.app_id)) {
+                // Add this app_id to our owned apps if it's not already there
+                ownedAppIds.push(data.application.app_id);
+                localStorage.setItem('owned_appids', JSON.stringify(ownedAppIds));
+            }
         } else {
             throw new Error(data.message || 'Failed to load application');
         }
