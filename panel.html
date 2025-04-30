@@ -932,7 +932,7 @@ function showToast(message, type = 'success') {
 
 toastClose.addEventListener('click', function() {
     toast.classList.remove('show');
-    if (toastTimeout) {
+    if (toastTimeout) { 
         clearTimeout(toastTimeout);
     }
 });
