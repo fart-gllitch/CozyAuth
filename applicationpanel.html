@@ -1292,8 +1292,7 @@ function fetchLicenses() {
         updatePagination(0);
     });
 }
-// Generate a new license key
-// Generate a new license key
+
 function generateLicenseKey() {
     // Show notification that we're generating the key
     showNotification('Generating license key...', 'info');
@@ -1306,7 +1305,7 @@ function generateLicenseKey() {
         },
         body: JSON.stringify({
             appId: appState.appId,
-            username: username
+            username: appState.username
         })
     })
     .then(response => {
