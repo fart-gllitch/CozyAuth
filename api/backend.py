@@ -318,15 +318,15 @@ def retrieve_keys():
     # Check if app_id is provided in the request
     if request.method == 'POST':
         data = request.get_json()
-        app_id = data.get('app_id')
+        app_id = data.get('appId')
     else:  # GET method
-        app_id = request.args.get('app_id')
+        app_id = request.args.get('appId')
     
     # Return error if app_id is not provided
     if not app_id:
         return jsonify({
             "error": "Missing app_id parameter",
-            "message": "Please provide an app_id to retrieve the associated keys"
+            "message": "Please provide an appId to retrieve the associated keys"
         }), 400
     
     # Check if Keys collection exists, if not create it
