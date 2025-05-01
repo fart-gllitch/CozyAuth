@@ -552,7 +552,7 @@ def generate_license():
     if not data or 'appId' not in data or 'username' not in data:
         return jsonify({"error": "App ID and username are required"}), 400
     
-    app_id = data['appid']
+    app_id = data['appId']
     username = data['username']
     days_valid = data.get('days_valid', 30)  # Default 30 days validity
     
