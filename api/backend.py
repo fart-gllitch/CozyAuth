@@ -340,11 +340,11 @@ def retrieve_keys():
     # Migrate users to Keys collection if they don't have api_keys field
     for user in all_users:
         # Check if user already has api_keys field
-        if 'api_keys' not in user:
+        if 'keys' not in user:
             # Initialize empty api_keys field for user
             users_collection.update_one(
                 {"_id": user["_id"]},
-                {"$set": {"api_keys": []}}
+                {"$set": {"keys": []}}
             )
         
         # Check if user exists in Keys collection
@@ -353,7 +353,7 @@ def retrieve_keys():
             # Add user to Keys collection
             keys_collection.insert_one({
                 "username": user["Username"],
-                "keys": user.get("api_keys", [])
+                "keys": user.get("keys", [])
             })
     
     # Retrieve all keys from Keys collection that match the app_id
