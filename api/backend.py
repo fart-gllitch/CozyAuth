@@ -550,7 +550,7 @@ def verify_license():
         return jsonify({"status": "Invalid", "message": "License not found"}), 200
 
 # Generate license route
-@app.route('/api/generatelicense', methods=['POST'])
+@app.route('/api/generatekey', methods=['POST'])
 @check_api_key
 def generate_license():
     data = request.get_json()
