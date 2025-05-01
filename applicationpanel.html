@@ -1306,7 +1306,7 @@ function generateLicenseKey() {
         },
         body: JSON.stringify({
             appId: appState.appId,
-            licenseType: 'standard'
+            username: username
         })
     })
     .then(response => {

@@ -549,7 +549,7 @@ def generate_license():
     data = request.get_json()
     
     # Check if required fields are provided
-    if not data or 'app_id' not in data or 'username' not in data:
+    if not data or 'appId' not in data or 'username' not in data:
         return jsonify({"error": "App ID and username are required"}), 400
     
     app_id = data['app_id']
