@@ -1232,17 +1232,23 @@ function fetchLicenses() {
     .then(data => {
         console.log('License data received:', data); // For debugging
         
-        // Handle the nested structure in the API response
+        // Extract licenses from the response structure
         let allLicenses = [];
         
-        if (data && Array.isArray(data.licenses)) {
-            // Extract all license keys from the nested structure
-            data.licenses.forEach(userObj => {
-                if (userObj && Array.isArray(userObj.licenses)) {
-                    // Add all licenses for this user to our collection
-                    allLicenses = allLicenses.concat(userObj.licenses);
-                }
-            });
+        try {
+            if (data && data.licenses && Array.isArray(data.licenses)) {
+                // Go through each user's license set
+                data.licenses.forEach(userObj => {
+                    if (userObj && userObj.licenses && Array.isArray(userObj.licenses)) {
+                        // Add all licenses for this user to our collection
+                        allLicenses = allLicenses.concat(userObj.licenses);
+                    }
+                });
+            }
+            
+            console.log('Extracted licenses:', allLicenses); // For debugging
+        } catch (error) {
+            console.error('Error processing license data:', error);
         }
         
         if (allLicenses.length > 0) {
@@ -1392,18 +1398,19 @@ function setupEventListeners() {
 }
 
 // Display licenses in the table
+// Display licenses in the table
 function displayLicenses(licenses) {
     const tableBody = document.getElementById('license-table-body');
     tableBody.innerHTML = '';
     
-    if (licenses.length === 0) {
+    if (!licenses || licenses.length === 0) {
         tableBody.innerHTML = `
             <tr>
                 <td colspan="6" class="empty-cell">
                     <div class="no-keys-message">
-                        No keys found! Maybe create one?
+                        No licenses found! Maybe create one?
                         <button class="btn btn-primary generate-key-btn" id="generate-first-key">
-                            <i class="fas fa-key"></i> Generate Key
+                            <i class="fas fa-key"></i> Generate License
                         </button>
                     </div>
                 </td>
@@ -1418,58 +1425,72 @@ function displayLicenses(licenses) {
     licenses.forEach(license => {
         const tr = document.createElement('tr');
         
-        // Get key data - adapt to the actual structure returned from API
-        const licenseKey = license.key || '';
+        // Format dates
+        const createdDate = new Date(license.creation_date);
+        const formattedCreated = createdDate.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
         
-        // Format dates if they exist
-        const createdDate = license.created_at ? new Date(license.created_at) : new Date();
-        const created = createdDate.toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'});
+        let expiresText = 'Never';
+        if (license.expiration_date) {
+            const expiryDate = new Date(license.expiration_date);
+            expiresText = expiryDate.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
         
-        // Default values for missing fields
-        const status = license.status || 'Active';
-        const expires = license.expires_at ? new Date(license.expires_at).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Never';
-        const lastUsed = license.last_used ? new Date(license.last_used).toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}) : 'Never';
+        // Status badge
+        const statusBadge = license.is_active 
+            ? '<span class="status-badge active">Active</span>' 
+            : '<span class="status-badge inactive">Inactive</span>';
         
-        // Determine status class
-        const statusClass = `status-${status.toLowerCase()}`;
+        // Last used date (if available)
+        const lastUsedText = license.last_used_date 
+            ? new Date(license.last_used_date).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              }) 
+            : 'Never';
         
+        // Create the table row
         tr.innerHTML = `
-            <td><span class="license-key">${licenseKey}</span></td>
-            <td><span class="status ${statusClass}">${status}</span></td>
-            <td>${created}</td>
-            <td>${expires}</td>
-            <td>${lastUsed}</td>
-            <td>
-                <div class="table-actions">
-                    <button class="action-btn view-license" data-key="${licenseKey}"><i class="fas fa-eye"></i></button>
-                    <button class="action-btn edit-license" data-key="${licenseKey}"><i class="fas fa-edit"></i></button>
-                    <button class="action-btn delete delete-license" data-key="${licenseKey}"><i class="fas fa-trash-alt"></i></button>
-                </div>
+            <td class="license-key-cell">${license.license_key}</td>
+            <td class="status-cell">${statusBadge}</td>
+            <td class="date-cell">${formattedCreated}</td>
+            <td class="date-cell">${expiresText}</td>
+            <td class="date-cell">${lastUsedText}</td>
+            <td class="actions-cell">
+                <button class="btn btn-icon view-btn" data-license="${license.license_key}" title="View Details">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn btn-icon edit-btn" data-license="${license.license_key}" title="Edit License">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-icon delete-btn" data-license="${license.license_key}" title="Delete License">
+                    <i class="fas fa-trash"></i>
+                </button>
             </td>
         `;
+        
         tableBody.appendChild(tr);
     });
     
-    // Add event listeners to the new buttons
-    document.querySelectorAll('.view-license').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const licenseKey = this.getAttribute('data-key');
-            viewLicenseDetails(licenseKey);
-        });
+    // Add event listeners to the action buttons
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', () => viewLicenseDetails(btn.dataset.license));
     });
     
-    document.querySelectorAll('.edit-license').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const licenseKey = this.getAttribute('data-key');
-            editLicense(licenseKey);
-        });
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => editLicense(btn.dataset.license));
     });
     
-    document.querySelectorAll('.delete-license').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const licenseKey = this.getAttribute('data-key');
-            deleteLicense(licenseKey);
-        });
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => deleteLicense(btn.dataset.license));
     });
 }
 
