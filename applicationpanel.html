@@ -1239,7 +1239,7 @@ function fetchLicenses() {
             // Extract all license keys from the nested structure
             data.keys.forEach(userKeysObj => {
                 if (userKeysObj && Array.isArray(userKeysObj.keys)) {
-                    licenses = licenses.concat(userKeysObj.keys);
+                    licenses = license_key.concat(userKeysObj.keys);
                 }
             });
         }
