@@ -311,7 +311,7 @@ def retrieve_api_key():
         }
     }), 200
 
-# Route to retrieve all keys and migrate users
+# Route to retrieve licenses for an app
 @app.route('/api/retrievekeys', methods=['GET', 'POST'])
 @check_api_key
 def retrieve_keys():
@@ -326,59 +326,52 @@ def retrieve_keys():
     if not app_id:
         return jsonify({
             "error": "Missing app_id parameter",
-            "message": "Please provide an appId to retrieve the associated keys"
+            "message": "Please provide an appId to retrieve the associated licenses"
         }), 400
     
-    # Check if Keys collection exists, if not create it
-    if "Keys" not in db.list_collection_names():
-        # Create the collection
-        db.create_collection("Keys")
+    # Check if Licenses collection exists
+    if "Licenses" not in db.list_collection_names():
+        return jsonify({
+            "message": f"No licenses found for app_id: {app_id}",
+            "licenses": [],
+            "total_users": 0,
+            "total_licenses": 0
+        }), 200
     
-    # Get all users
-    all_users = list(users_collection.find())
+    # Get licenses collection
+    licenses_collection = db["Licenses"]
     
-    # Migrate users to Keys collection if they don't have api_keys field
-    for user in all_users:
-        # Check if user already has api_keys field
-        if 'keys' not in user:
-            # Initialize empty api_keys field for user
-            users_collection.update_one(
-                {"_id": user["_id"]},
-                {"$set": {"keys": []}}
-            )
+    # Retrieve all licenses that match the app_id
+    matching_licenses = list(licenses_collection.find({"app_id": app_id}, {"_id": 0}))
+    
+    # Group licenses by username
+    licenses_by_user = {}
+    for license in matching_licenses:
+        username = license.get("username")
+        # Convert datetime objects to ISO format
+        if "creation_date" in license:
+            license["creation_date"] = license["creation_date"].isoformat()
+        if "expiration_date" in license:
+            license["expiration_date"] = license["expiration_date"].isoformat()
+            
+        if username not in licenses_by_user:
+            licenses_by_user[username] = []
         
-        # Check if user exists in Keys collection
-        existing_key_user = keys_collection.find_one({"username": user["Username"]})
-        if not existing_key_user:
-            # Add user to Keys collection
-            keys_collection.insert_one({
-                "username": user["Username"],
-                "keys": user.get("keys", [])
-            })
+        licenses_by_user[username].append(license)
     
-    # Retrieve all keys from Keys collection that match the app_id
-    matching_keys = []
-    all_key_users = list(keys_collection.find({}, {"_id": 0}))
-    
-    for user in all_key_users:
-        username = user["username"]
-        # Filter keys for this user that match the app_id
-        matching_user_keys = [
-            key for key in user.get("keys", []) 
-            if key.get("app_id") == app_id
-        ]
-        
-        if matching_user_keys:
-            matching_keys.append({
-                "username": username,
-                "keys": matching_user_keys
-            })
+    # Format the result
+    result_licenses = []
+    for username, licenses in licenses_by_user.items():
+        result_licenses.append({
+            "username": username,
+            "licenses": licenses
+        })
     
     return jsonify({
-        "message": f"Keys retrieved successfully for app_id: {app_id}",
-        "keys": matching_keys,
-        "total_users": len(matching_keys),
-        "total_keys": sum(len(user.get("keys", [])) for user in matching_keys)
+        "message": f"Licenses retrieved successfully for app_id: {app_id}",
+        "licenses": result_licenses,
+        "total_users": len(result_licenses),
+        "total_licenses": len(matching_licenses)
     }), 200
 
 # Route to generate a new API key for a user and app
