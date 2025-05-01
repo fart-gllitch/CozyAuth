@@ -12,8 +12,7 @@ import random
 import hashlib
 import time
 import uuid
-import functools
-
+from functools import wraps
 app = Flask(__name__)
 
 # MongoDB connection
@@ -42,6 +41,53 @@ def generate_app_id():
         if not existing_app:
             return app_id
 
+def check_api_key(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Check if API key was provided in header or query parameter
+        api_key = request.headers.get('X-API-Key') or request.args.get('api_key')
+        
+        # If API key was provided, validate it
+        if api_key:
+            # Check in Keys collection first (more efficient)
+            key_found = False
+            username = None
+            
+            if "Keys" in db.list_collection_names():
+                all_users = list(keys_collection.find())
+                for user in all_users:
+                    for key in user.get("keys", []):
+                        if key.get("key") == api_key:
+                            key_found = True
+                            username = user.get("username")
+                            break
+                    if key_found:
+                        break
+            
+            # If not found in Keys collection, check in users
+            if not key_found:
+                all_users = list(users_collection.find())
+                for user in all_users:
+                    for key in user.get("api_keys", []):
+                        if key.get("key") == api_key:
+                            key_found = True
+                            username = user.get("Username")
+                            break
+                    if key_found:
+                        break
+            
+            # If API key valid, set username in request context and proceed
+            if key_found and username:
+                request.api_key_username = username
+                return f(*args, **kwargs)
+            else:
+                return jsonify({"error": "Invalid API key"}), 401
+        
+        # If no API key, proceed with normal function execution
+        return f(*args, **kwargs)
+    
+    return decorated_function
+
 # Generate unique API key
 def generate_api_key():
     # Generate a unique key based on UUID and current timestamp
@@ -50,93 +96,6 @@ def generate_api_key():
     hashed = hashlib.sha256(unique_string.encode()).hexdigest()
     # Return the first 32 characters as the API key
     return hashed[:32]
-
-# Function to verify API key
-def verify_api_key(api_key):
-    """
-    Verifies if the given API key is valid by checking all users in the database.
-    Returns a tuple (valid, app_id) where valid is a boolean and app_id is the associated app ID if found.
-    """
-    # Check in Keys collection first (more efficient)
-    if "Keys" in db.list_collection_names():
-        all_users = list(keys_collection.find())
-        for user in all_users:
-            for key in user.get("keys", []):
-                if key.get("key") == api_key:
-                    return True, key.get("app_id")
-    
-    # If not found in Keys collection, check in users
-    all_users = list(users_collection.find())
-    for user in all_users:
-        for key in user.get("api_keys", []):
-            if key.get("key") == api_key:
-                return True, key.get("app_id")
-    
-    return False, None
-
-# Authentication decorator that supports both Basic auth and API key
-def flexible_auth(f):
-    @functools.wraps(f)
-    def decorated(*args, **kwargs):
-        # First check for API key in header
-        api_key = request.headers.get('X-API-Key')
-        if api_key:
-            is_valid, _ = verify_api_key(api_key)
-            if is_valid:
-                return f(*args, **kwargs)
-        
-        # Then check for API key in parameters
-        api_key = request.args.get('api_key')
-        if api_key:
-            is_valid, _ = verify_api_key(api_key)
-            if is_valid:
-                return f(*args, **kwargs)
-        
-        # Finally check for form data if POST request
-        if request.method == 'POST':
-            api_key = request.form.get('api_key')
-            if api_key:
-                is_valid, _ = verify_api_key(api_key)
-                if is_valid:
-                    return f(*args, **kwargs)
-            
-            # Check JSON body for API key
-            if request.is_json:
-                data = request.get_json()
-                if data and 'api_key' in data:
-                    is_valid, _ = verify_api_key(data['api_key'])
-                    if is_valid:
-                        return f(*args, **kwargs)
-        
-        # If no API key or invalid API key, fall back to basic auth
-        auth_header = request.headers.get('Authorization')
-        if not auth_header or not auth_header.startswith('Basic '):
-            return jsonify({"error": "Authentication required. Provide either Basic Auth or API key"}), 401
-        
-        # Extract and decode credentials from Basic auth
-        try:
-            encoded_credentials = auth_header.split(' ')[1]
-            decoded_credentials = base64.b64decode(encoded_credentials).decode('utf-8')
-            username, password = decoded_credentials.split(':')
-        except Exception:
-            return jsonify({"error": "Invalid authorization format"}), 401
-        
-        # Encode the provided password for comparison
-        encoded_password = encode_password(password)
-        
-        # Find user in database
-        user = users_collection.find_one({"Username": username})
-        
-        # Validate credentials
-        if not user:
-            return jsonify({"error": "User not found"}), 401
-        
-        if user['Password'] != encoded_password:
-            return jsonify({"error": "Invalid credentials"}), 401
-        
-        return f(*args, **kwargs)
-    
-    return decorated
 
 @app.route('/')
 def index():
@@ -151,8 +110,8 @@ def register():
     if not data or 'username' not in data or 'password' not in data:
         return jsonify({"error": "Username and Password are required"}), 400
     
-    username = data.get('Username', data.get('username'))
-    password = data.get('Password', data.get('password'))
+    username = data['Username']
+    password = data['Password']
     
     # Check if user already exists
     existing_user = users_collection.find_one({"Username": username})
@@ -176,35 +135,17 @@ def register():
  
 # Login route
 @app.route('/api/login', methods=['POST'])
+@check_api_key
 def login():
-    # Check for API key authentication first
-    api_key = None
-    if request.headers.get('X-API-Key'):
-        api_key = request.headers.get('X-API-Key')
-    elif request.args.get('api_key'):
-        api_key = request.args.get('api_key')
-    elif request.is_json and request.get_json() and 'api_key' in request.get_json():
-        api_key = request.get_json()['api_key']
-    elif request.form.get('api_key'):
-        api_key = request.form.get('api_key')
     
-    if api_key:
-        is_valid, _ = verify_api_key(api_key)
-        if is_valid:
-            return jsonify({"message": "Login successful via API key"}), 200
-
-    # If no API key or invalid API key, check username/password
-    if request.is_json:
-        data = request.get_json()
-    else:
-        data = request.form
-
+    data = request.get_json()
+    
     # Check if required fields are provided
-    if not data or ('Username' not in data and 'username' not in data) or ('Password' not in data and 'password' not in data):
+    if not data or 'Username' not in data or 'Password' not in data:
         return jsonify({"error": "Username and Password are required"}), 400
     
-    username = data.get('Username', data.get('username'))
-    password = data.get('Password', data.get('password'))
+    username = data['Username']
+    password = data['Password']
     
     # Encode the provided password for comparison
     encoded_password = encode_password(password)
@@ -223,7 +164,7 @@ def login():
 
 # Create application route
 @app.route('/api/createapplication', methods=['POST'])
-@flexible_auth
+@check_api_key
 def create_application():
     data = request.get_json()
     
@@ -256,8 +197,36 @@ def create_application():
 
 # Get applications route
 @app.route('/api/getapplications', methods=['GET', 'POST'])
-@flexible_auth
+@check_api_key
 def get_applications():
+    # Get authorization header
+    auth_header = request.headers.get('Authorization')
+    
+    # Check if Authorization header is provided
+    if not auth_header or not auth_header.startswith('Basic '):
+        return jsonify({"error": "Authorization required"}), 401
+    
+    # Extract and decode credentials from Basic auth
+    try:
+        encoded_credentials = auth_header.split(' ')[1]
+        decoded_credentials = base64.b64decode(encoded_credentials).decode('utf-8')
+        username, password = decoded_credentials.split(':')
+    except Exception:
+        return jsonify({"error": "Invalid authorization format"}), 401
+    
+    # Encode the provided password for comparison
+    encoded_password = encode_password(password)
+    
+    # Find user in database
+    user = users_collection.find_one({"Username": username})
+    
+    # Validate credentials
+    if not user:
+        return jsonify({"error": "User not found"}), 401
+    
+    if user['Password'] != encoded_password:
+        return jsonify({"error": "Invalid credentials"}), 401
+    
     # Check if app_id was provided in either GET or POST request
     app_id = None
     
@@ -288,7 +257,7 @@ def get_applications():
 
 # Route to retrieve API key for a user and app
 @app.route('/api/retrieveapikey', methods=['POST'])
-@flexible_auth
+@check_api_key
 def retrieve_api_key():
     data = request.get_json()
     
@@ -344,7 +313,7 @@ def retrieve_api_key():
 
 # Route to retrieve all keys and migrate users
 @app.route('/api/retrievekeys', methods=['GET', 'POST'])
-@flexible_auth
+@check_api_key
 def retrieve_keys():
     # Check if app_id is provided in the request
     if request.method == 'POST':
@@ -414,7 +383,7 @@ def retrieve_keys():
 
 # Route to generate a new API key for a user and app
 @app.route('/api/newapikey', methods=['POST'])
-@flexible_auth
+@check_api_key
 def new_api_key():
     data = request.get_json()
     
@@ -516,36 +485,47 @@ def new_api_key():
     }), 201
 
 @app.route('/api/verify', methods=['POST'])
+@check_api_key
 def verify_license():
-    # Check for API key authentication first
-    api_key = None
-    if request.headers.get('X-API-Key'):
-        api_key = request.headers.get('X-API-Key')
-    elif request.args.get('api_key'):
-        api_key = request.args.get('api_key')
-    elif request.form.get('api_key'):
-        api_key = request.form.get('api_key')
-    
-    if api_key:
-        is_valid, app_id_from_key = verify_api_key(api_key)
-        if not is_valid:
-            return jsonify({"error": "Invalid API key"}), 401
-    
     # Get form data
+    api_key = request.form.get('api_key')
     license_key = request.form.get('license')
-    
-    # Now either use the form's api_key or the one from headers/parameters
-    api_key = request.form.get('api_key') or api_key
     
     # Validate inputs
     if not api_key or not license_key:
         return jsonify({"error": "API key and license key are required"}), 400
     
-    # Check if API key exists in any user if not already verified
-    if not is_valid:
-        is_valid, app_id_from_key = verify_api_key(api_key)
-        if not is_valid:
-            return jsonify({"error": "Invalid API key"}), 401
+    # Check if API key exists in any user
+    key_found = False
+    app_id = None
+    
+    # Check in Keys collection first (more efficient)
+    if "Keys" in db.list_collection_names():
+        all_users = list(keys_collection.find())
+        for user in all_users:
+            for key in user.get("keys", []):
+                if key.get("key") == api_key:
+                    key_found = True
+                    app_id = key.get("app_id")
+                    break
+            if key_found:
+                break
+    
+    # If not found in Keys collection, check in users
+    if not key_found:
+        all_users = list(users_collection.find())
+        for user in all_users:
+            for key in user.get("api_keys", []):
+                if key.get("key") == api_key:
+                    key_found = True
+                    app_id = key.get("app_id")
+                    break
+            if key_found:
+                break
+    
+    # If API key not found
+    if not key_found:
+        return jsonify({"error": "Invalid API key"}), 401
     
     # Create a new collection for licenses if it doesn't exist
     if "Licenses" not in db.list_collection_names():
@@ -554,7 +534,7 @@ def verify_license():
     licenses_collection = db["Licenses"]
     
     # Check if license exists
-    license_doc = licenses_collection.find_one({"license_key": license_key, "app_id": app_id_from_key})
+    license_doc = licenses_collection.find_one({"license_key": license_key, "app_id": app_id})
     
     if license_doc:
         # Check if license is expired
@@ -571,7 +551,7 @@ def verify_license():
 
 # Generate license route
 @app.route('/api/generatelicense', methods=['POST'])
-@flexible_auth
+@check_api_key
 def generate_license():
     data = request.get_json()
     
@@ -651,7 +631,7 @@ def generate_license_key():
 
 # Route to get all licenses for a user
 @app.route('/api/getlicenses', methods=['POST'])
-@flexible_auth
+@check_api_key
 def get_licenses():
     data = request.get_json()
     
@@ -698,7 +678,7 @@ def get_licenses():
 
 # Route to revoke a license
 @app.route('/api/revokelicense', methods=['POST'])
-@flexible_auth
+@check_api_key
 def revoke_license():
     data = request.get_json()
     
@@ -732,37 +712,35 @@ def revoke_license():
 
 # Route to get dashboard statistics
 @app.route('/api/dashboardstats', methods=['GET'])
-@flexible_auth
+@check_api_key
 def dashboard_stats():
-    # Get username from authentication context (available from decorator)
-    # We need to extract the username from the request
-    username = None
-    
-    # Try to get username from Basic Auth
+    # Get authorization header
     auth_header = request.headers.get('Authorization')
-    if auth_header and auth_header.startswith('Basic '):
-        try:
-            encoded_credentials = auth_header.split(' ')[1]
-            decoded_credentials = base64.b64decode(encoded_credentials).decode('utf-8')
-            username, _ = decoded_credentials.split(':')
-        except Exception:
-            pass
     
-    # If no username from Basic Auth, try to get it from API key
-    if not username:
-        api_key = request.headers.get('X-API-Key') or request.args.get('api_key')
-        if api_key:
-            # Find username associated with this API key
-            found = False
-            all_users = list(users_collection.find())
-            for user in all_users:
-                for key in user.get('api_keys', []):
-                    if key.get('key') == api_key:
-                        username = user['Username']
-                        found = True
-                        break
-                if found:
-                    break
+    # Check if Authorization header is provided
+    if not auth_header or not auth_header.startswith('Basic '):
+        return jsonify({"error": "Authorization required"}), 401
+    
+    # Extract and decode credentials from Basic auth
+    try:
+        encoded_credentials = auth_header.split(' ')[1]
+        decoded_credentials = base64.b64decode(encoded_credentials).decode('utf-8')
+        username, password = decoded_credentials.split(':')
+    except Exception:
+        return jsonify({"error": "Invalid authorization format"}), 401
+    
+    # Encode the provided password for comparison
+    encoded_password = encode_password(password)
+    
+    # Find user in database
+    user = users_collection.find_one({"Username": username})
+    
+    # Validate credentials
+    if not user:
+        return jsonify({"error": "User not found"}), 401
+    
+    if user['Password'] != encoded_password:
+        return jsonify({"error": "Invalid credentials"}), 401
     
     # Collect statistics
     stats = {}
@@ -794,19 +772,17 @@ def dashboard_stats():
             "expiration_date": {"$lt": datetime.datetime.utcnow()}
         })
     
-    # Get user's applications if username is available
+    # Get user's applications
     user_apps = []
-    if username:
-        user = users_collection.find_one({"Username": username})
-        if user and 'api_keys' in user:
-            app_ids = set()
-            for key in user['api_keys']:
-                app_ids.add(key.get('app_id'))
-            
-            for app_id in app_ids:
-                app = applications_collection.find_one({"app_id": app_id}, {"_id": 0})
-                if app:
-                    user_apps.append(app)
+    if 'api_keys' in user:
+        app_ids = set()
+        for key in user['api_keys']:
+            app_ids.add(key.get('app_id'))
+        
+        for app_id in app_ids:
+            app = applications_collection.find_one({"app_id": app_id}, {"_id": 0})
+            if app:
+                user_apps.append(app)
     
     stats["user_applications"] = user_apps
     
