@@ -1233,20 +1233,20 @@ function fetchLicenses() {
         console.log('License data received:', data); // For debugging
         
         // Handle the nested structure in the API response
-        let licenses = [];
+        let license_key = [];
         
         if (data && Array.isArray(data.keys)) {
             // Extract all license keys from the nested structure
             data.keys.forEach(userKeysObj => {
                 if (userKeysObj && Array.isArray(userKeysObj.keys)) {
-                    licenses = license_key.concat(userKeysObj.keys);
+                    license_key = license_key.concat(userKeysObj.keys);
                 }
             });
         }
         
-        if (licenses.length > 0) {
-            displayLicenses(licenses);
-            updatePagination(data.total_keys || licenses.length);
+        if (license_key.length > 0) {
+            displayLicenses(license_key);
+            updatePagination(data.total_keys || license_key.length);
         } else {
             console.error('No licenses found in the response', data);
             tableBody.innerHTML = `
@@ -1292,7 +1292,6 @@ function fetchLicenses() {
         updatePagination(0);
     });
 }
-
 function generateLicenseKey() {
     // Show notification that we're generating the key
     showNotification('Generating license key...', 'info');
