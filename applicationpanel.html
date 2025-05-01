@@ -1233,20 +1233,21 @@ function fetchLicenses() {
         console.log('License data received:', data); // For debugging
         
         // Handle the nested structure in the API response
-        let license_key = [];
+        let allLicenses = [];
         
-        if (data && Array.isArray(data.keys)) {
+        if (data && Array.isArray(data.licenses)) {
             // Extract all license keys from the nested structure
-            data.keys.forEach(userKeysObj => {
-                if (userKeysObj && Array.isArray(userKeysObj.keys)) {
-                    license_key = license_key.concat(userKeysObj.keys);
+            data.licenses.forEach(userObj => {
+                if (userObj && Array.isArray(userObj.licenses)) {
+                    // Add all licenses for this user to our collection
+                    allLicenses = allLicenses.concat(userObj.licenses);
                 }
             });
         }
         
-        if (license_key.length > 0) {
-            displayLicenses(license_key);
-            updatePagination(data.total_keys || license_key.length);
+        if (allLicenses.length > 0) {
+            displayLicenses(allLicenses);
+            updatePagination(data.total_licenses || allLicenses.length);
         } else {
             console.error('No licenses found in the response', data);
             tableBody.innerHTML = `
@@ -1276,9 +1277,9 @@ function fetchLicenses() {
             <tr>
                 <td colspan="6" class="empty-cell">
                     <div class="no-keys-message">
-                        No keys found! Maybe create one?
+                        No licenses found! Maybe create one?
                         <button class="btn btn-primary generate-key-btn" id="generate-first-key">
-                            <i class="fas fa-key"></i> Generate Key
+                            <i class="fas fa-key"></i> Generate License
                         </button>
                     </div>
                 </td>
